@@ -12,10 +12,10 @@ import {
 import {
   CreateAccountDto,
   CreateUserDto,
+  UpdateUserDto,
   UserDto,
 
 } from './dto/user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
 import * as crypto from 'crypto';
@@ -28,8 +28,9 @@ import {
   sendEmail,
   checkForRequiredFields,
   compareEnumValueFields,
+  validateURLField,
 } from 'src/utils/utils.function';
-import { UpdatePasswordDTO } from 'src/utils/utils.types';
+import { BaseResponseTypeDTO, UpdatePasswordDTO } from 'src/utils/utils.types';
 import { decode, sign } from 'jsonwebtoken';
 import { ThirdPartyLoginDTO } from 'src/auth/dto/auth.dto';
 import { AppRole, AuthProvider } from 'src/utils/utils.constant';
@@ -76,6 +77,76 @@ export class UsersService {
     //     createdUser.email,
     //   ]);
     return User_created;
+  }
+
+  async ThirdPartysignUpOrLogin(payload: ThirdPartyLoginDTO): Promise<any> {
+    try {
+      // Perform necessary field checks and validations
+      checkForRequiredFields(['provider', 'thirdPartyUserId'], payload);
+      compareEnumValueFields(
+        payload.provider,
+        Object.values(AuthProvider),
+        'provider',
+      );
+      let isNewUser = false;
+
+      // Find the user by externalUserId or email
+      let record = await this.UsersModel.findOne({
+        $or: [
+          { externalUserId: payload.thirdPartyUserId },
+          { email: payload.email?.toLowerCase() },
+        ],
+      }).exec();
+
+      // If the user doesn't exist, create a new one
+      if (!record) {
+        isNewUser = true;
+        const createdRecord = new this.UsersModel({
+          ...payload,
+          externalUserId: payload.thirdPartyUserId,
+          status: true,
+          IsEmailVerified: true,
+        });
+
+        await createdRecord.save();
+        record = createdRecord;
+
+        // You can also set user-specific settings here if necessary
+      }
+
+      // Generate the JWT token
+      const { createdDate, email, role, _id } = record;
+      const token = this.signPayload({
+        createdDate,
+        email,
+        role,
+        userId: _id,
+      });
+
+      const decodedToken: any = decode(token);
+      const { exp, iat } = decodedToken;
+
+      return {
+        success: true,
+        message: 'Login successful',
+        code: HttpStatus.OK,
+        data: {
+          userId: _id,
+          isNewUser,
+          role,
+          email,
+          dateCreated: createdDate,
+          token,
+          tokenInitializationDate: iat,
+          tokenExpiryDate: exp,
+          user: record,
+        },
+      };
+    } catch (ex) {
+      // Handle errors and log them
+      console.error(ex);
+      throw ex;
+    }
   }
 
   async findUserByEmailAndPasswordAndUpdateVerificationcode(
@@ -294,4 +365,80 @@ export class UsersService {
       throw ex;
     }
   }
+
+  
+  async updateUser(
+    userId: string,
+    payload: UpdateUserDto,
+  ): Promise<BaseResponseTypeDTO> {
+    try {
+      // checkForRequiredFields(['userId'], userId);
+      const record = await this.UsersModel.findOne({ _id: userId });
+
+      if (!record) {
+        throw new NotFoundException(
+          `User not found, therefore cannot be updated.`,
+        );
+      }
+
+      if (!record?.id) {
+        throw new NotFoundException('User with id not found');
+      }
+      // if ('enableFaceId' in payload) {
+      //   record.enableFaceId = payload.enableFaceId;
+      // }
+      if ('allowEmailNotifications' in payload) {
+        record.allowEmailNotifications = payload.allowEmailNotifications;
+      }
+      if ('allowSmsNotifications' in payload) {
+        record.allowSmsNotifications = payload.allowSmsNotifications;
+      }
+      if ('allowPushNotifications' in payload) {
+        record.allowPushNotifications = payload.allowPushNotifications;
+      }
+      // if (payload.dob && record.dob !== payload.dob) {
+      //   validatePastDate(payload.dob, 'dob');
+      //   record.dob = payload.dob;
+      // }
+      if (payload.phoneNumber && payload.phoneNumber !== record.phoneNumber) {
+        record.phoneNumber = payload.phoneNumber;
+      }
+      if (payload.email && payload.email !== record.email) {
+        validateEmailField(payload.email);
+        record.email = payload.email.toUpperCase();
+      }
+      if (payload.firstName && payload.firstName !== record.firstName) {
+        record.firstName = payload.firstName.toUpperCase();
+      }
+      if (payload.lastName && payload.lastName !== record.lastName) {
+        record.lastName = payload.lastName.toUpperCase();
+      }
+      // if (payload.gender && payload.gender !== record.gender) {
+      //   compareEnumValueFields(payload.gender, Object.values(Gender), 'gender');
+      //   record.gender = payload.gender;
+      // }
+      // if (payload.password) {
+      //   record.password = await hashPassword(payload.password);
+      // }
+      if (
+        payload.profileImageUrl &&
+        payload.profileImageUrl !== record.profileImageUrl
+      ) {
+        validateURLField(payload.profileImageUrl, 'profileImageUrl');
+        record.profileImageUrl = payload.profileImageUrl;
+      }
+
+  
+      const updatedUser = await record.save();
+      return {
+        success: true,
+        code: HttpStatus.OK,
+        message: 'Updated',
+      };
+    } catch (ex) {
+      this.logger.error(ex);
+      throw ex;
+    }
+  }
+
 }

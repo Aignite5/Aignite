@@ -44,6 +44,7 @@ export enum AuthProvider {
   LOCAL = 'LOCAL',
   FACEBOOK = 'FACEBOOK',
   GOOGLE = 'GOOGLE',
+  LINKEDIN = 'LINKEDIN',
 }
 
 

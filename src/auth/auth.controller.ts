@@ -53,4 +53,33 @@ export class AuthController {
   async userlogin(@Body() payload: LoginUserDTO) {
     return await this.authService.Userlogin(payload);
   }
+
+  @Post('third-party-login-signup')
+  @ApiOperation({
+    summary: 'Sign Up or Login via Third-Party Provider',
+    description: 'Allows users to sign up or log in using third-party authentication providers.',
+  })
+  @ApiBody({ type: ThirdPartyLoginDTO })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Successful login or registration.',
+    type: ThirdPartyAuthResponseDTO,
+  })
+  async signUpOrLogin(
+    @Body() payload: ThirdPartyLoginDTO,
+  ): Promise<ThirdPartyAuthResponseDTO> {
+    try {
+      const response = await this.UserSrv.ThirdPartysignUpOrLogin(payload);
+      return response;
+    } catch (error) {
+      console.log(error)
+      throw new HttpException(
+        {
+          status: HttpStatus.INTERNAL_SERVER_ERROR,
+          error: error.message || 'An error occurred during the login process.',
+        },
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+}
 }
