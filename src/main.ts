@@ -16,8 +16,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: { origin: '*' } });
 
   const config = new DocumentBuilder()
-    .setTitle('AI-IGNITE')
-    .setDescription(`The API for AI IGNITE`)
+    .setTitle('BRIDGE AI')
+    .setDescription(`The API for BRIDGE AI`)
     .setVersion('1.0')
     .addBearerAuth(
       {

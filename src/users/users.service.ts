@@ -428,9 +428,44 @@ export class UsersService {
         record.profileImageUrl = payload.profileImageUrl;
       }
 
+         // Academic Background
+    if (payload.highestEducation && payload.highestEducation !== record.highestEducation) {
+      record.highestEducation = payload.highestEducation;
+    }
+    if (payload.fieldsOfStudy && JSON.stringify(payload.fieldsOfStudy) !== JSON.stringify(record.fieldsOfStudy)) {
+      record.fieldsOfStudy = payload.fieldsOfStudy;
+    }
+    if (payload.universityOrInstitution && payload.universityOrInstitution !== record.universityOrInstitution) {
+      record.universityOrInstitution = payload.universityOrInstitution;
+    }
+
+    // Career Interests
+    if (payload.industriesOfInterest && JSON.stringify(payload.industriesOfInterest) !== JSON.stringify(record.industriesOfInterest)) {
+      record.industriesOfInterest = payload.industriesOfInterest;
+    }
+    if (payload.currentJobTitle && payload.currentJobTitle !== record.currentJobTitle) {
+      record.currentJobTitle = payload.currentJobTitle;
+    }
+    if (payload.careerExperience && payload.careerExperience !== record.careerExperience) {
+      record.careerExperience = payload.careerExperience;
+    }
+
+    // Hobbies & Skills
+    if (payload.hobbies && JSON.stringify(payload.hobbies) !== JSON.stringify(record.hobbies)) {
+      record.hobbies = payload.hobbies;
+    }
+    if (payload.skills && JSON.stringify(payload.skills) !== JSON.stringify(record.skills)) {
+      record.skills = payload.skills;
+    }
+
+    // Future Aspirations
+    if (payload.futureAspirations && payload.futureAspirations !== record.futureAspirations) {
+      record.futureAspirations = payload.futureAspirations;
+    }
   
       const updatedUser = await record.save();
       return {
+        // data:updatedUser,
         success: true,
         code: HttpStatus.OK,
         message: 'Updated',
