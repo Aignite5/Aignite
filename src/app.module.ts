@@ -7,6 +7,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { AzureOpenaiModule } from './azure-openai/azure-openai.module';
 
 
 
@@ -19,6 +20,7 @@ import { UsersModule } from './users/users.module';
     MongooseModule.forRoot(String(process.env.MONGODB_URL).trim()),
     AuthModule,
     UsersModule,
+    AzureOpenaiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
