@@ -35,6 +35,7 @@ import { decode, sign } from 'jsonwebtoken';
 import { ThirdPartyLoginDTO } from 'src/auth/dto/auth.dto';
 import { AppRole, AuthProvider } from 'src/utils/utils.constant';
 import { Users } from './schema/user.schema';
+import { AzureOpenaiService } from 'src/azure-openai/azure-openai.service';
 
 @Injectable()
 export class UsersService {
@@ -46,7 +47,9 @@ export class UsersService {
 
   constructor(
     @InjectModel(Users.name) private readonly UsersModel: Model<Users>,
+    // private readonly OpenAiSrv: AzureOpenaiService,
   ) {}
+
 
   async createuser(
     CreateUser: CreateAccountDto, // : Promise<User>
