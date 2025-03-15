@@ -149,6 +149,129 @@ export class UserDto {
 
 // export class updateUserDto extends UserDto {}
 
+// export class UpdateUserDto {
+//   @ApiPropertyOptional({ example: 'John', description: 'User first name' })
+//   @IsOptional()
+//   @IsString()
+//   firstName?: string;
+
+//   @ApiPropertyOptional({ example: 'Doe', description: 'User last name' })
+//   @IsOptional()
+//   @IsString()
+//   lastName?: string;
+
+//   @ApiPropertyOptional({ example: 'https://example.com/profile.jpg', description: 'User profile picture URL' })
+//   @IsOptional()
+//   @IsString()
+//   profilePic?: string;
+
+//   @ApiPropertyOptional({ example: 'john.doe@example.com', description: 'User email address' })
+//   @IsOptional()
+//   @IsEmail()
+//   email?: string;
+
+//   @ApiPropertyOptional({ example: '1995-08-15', description: 'Date of birth (YYYY-MM-DD)' })
+//   @IsOptional()
+//   @IsDate()
+//   date_of_birth?: Date;
+
+//   @ApiPropertyOptional({ example: '123 Main Street, City, Country', description: 'User address' })
+//   @IsOptional()
+//   @IsString()
+//   address?: string;
+
+//   @ApiPropertyOptional({ example: '+1234567890', description: 'User phone number' })
+//   @IsOptional()
+//   @IsString()
+//   phoneNumber?: string;
+
+//   @ApiPropertyOptional({ example: 'Nigeria', description: 'Country of residence' })
+//   @IsOptional()
+//   @IsString()
+//   Country?: string;
+
+//   // @ApiPropertyOptional({ example: AppRole.USER, enum: AppRole, description: 'User role' })
+//   // @IsOptional()
+//   // role?: AppRole;
+
+//   // @ApiPropertyOptional({ example: false, description: 'Account status (active/inactive)' })
+//   // @IsOptional()
+//   // @IsBoolean()
+//   // status?: boolean;
+
+//   @ApiPropertyOptional({ example: true, description: 'Allow push notifications' })
+//   @IsOptional()
+//   @IsBoolean()
+//   allowPushNotifications?: boolean;
+
+//   @ApiPropertyOptional({ example: false, description: 'Allow SMS notifications' })
+//   @IsOptional()
+//   @IsBoolean()
+//   allowSmsNotifications?: boolean;
+
+//   @ApiPropertyOptional({ example: true, description: 'Allow email notifications' })
+//   @IsOptional()
+//   @IsBoolean()
+//   allowEmailNotifications?: boolean;
+
+//   @ApiProperty()
+//   profileImageUrl: string;
+
+//   // Academic Background
+//   @ApiPropertyOptional({ example: "Bachelor's Degree", description: 'Highest level of education' })
+//   @IsOptional()
+//   @IsString()
+//   highestLevelOfEducation?: string;
+
+//   @ApiPropertyOptional({ example: ['Engineering', 'Computer Science'], description: 'Fields of study' })
+//   @IsOptional()
+//   @IsArray()
+//   @IsString({ each: true })
+//   fieldOfStudy?: string[];
+
+//   @ApiPropertyOptional({ example: 'Harvard University', description: 'University or institution attended' })
+//   @IsOptional()
+//   @IsString()
+//   universityOrInstitution?: string;
+
+//   // Career Interests
+//   @ApiPropertyOptional({ example: ['Technology', 'Finance'], description: 'Industries of interest' })
+//   @IsOptional()
+//   @IsArray()
+//   @IsString({ each: true })
+//   industriesOfInterest?: string[];
+
+//   @ApiPropertyOptional({ example: 'Software Engineer', description: 'Current job title' })
+//   @IsOptional()
+//   @IsString()
+//   currentJobTitle?: string;
+
+//   @ApiPropertyOptional({ example: '5 years experience in web development', description: 'Career experience details' })
+//   @IsOptional()
+//   @IsString()
+//   careerExperience?: string;
+
+//   // Hobbies and Skills
+//   @ApiPropertyOptional({ example: ['Coding', 'Football'], description: 'User hobbies' })
+//   @IsOptional()
+//   @IsArray()
+//   @IsString({ each: true })
+//   hobbies?: string[];
+
+//   @ApiPropertyOptional({ example: ['JavaScript', 'Python'], description: 'User skills' })
+//   @IsOptional()
+//   @IsArray()
+//   @IsString({ each: true })
+//   skills?: string[];
+
+//   // Future Aspirations
+//   @ApiPropertyOptional({ example: 'Become a tech entrepreneur', description: 'User future aspirations' })
+//   @IsOptional()
+//   @IsString()
+//   futureAspirations?: string;
+
+// }
+
 export class UpdateUserDto {
   @ApiPropertyOptional({ example: 'John', description: 'User first name' })
   @IsOptional()
@@ -160,114 +283,269 @@ export class UpdateUserDto {
   @IsString()
   lastName?: string;
 
-  @ApiPropertyOptional({ example: 'https://example.com/profile.jpg', description: 'User profile picture URL' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/profile.jpg',
+    description: 'User profile picture URL',
+  })
   @IsOptional()
   @IsString()
   profilePic?: string;
 
-  @ApiPropertyOptional({ example: 'john.doe@example.com', description: 'User email address' })
+  @ApiPropertyOptional({
+    example: 'john.doe@example.com',
+    description: 'User email address',
+  })
   @IsOptional()
   @IsEmail()
   email?: string;
 
-  @ApiPropertyOptional({ example: '1995-08-15', description: 'Date of birth (YYYY-MM-DD)' })
+  @ApiPropertyOptional({
+    example: '1995-08-15',
+    description: 'Date of birth (YYYY-MM-DD)',
+  })
   @IsOptional()
   @IsDate()
   date_of_birth?: Date;
 
-  @ApiPropertyOptional({ example: '123 Main Street, City, Country', description: 'User address' })
+  @ApiPropertyOptional({
+    example: '123 Main Street, City, Country',
+    description: 'User address',
+  })
   @IsOptional()
   @IsString()
   address?: string;
 
-  @ApiPropertyOptional({ example: '+1234567890', description: 'User phone number' })
+  @ApiPropertyOptional({
+    example: '+1234567890',
+    description: 'User phone number',
+  })
   @IsOptional()
   @IsString()
   phoneNumber?: string;
 
-  @ApiPropertyOptional({ example: 'Nigeria', description: 'Country of residence' })
+  @ApiPropertyOptional({
+    example: 'Nigeria',
+    description: 'Country of residence',
+  })
   @IsOptional()
   @IsString()
   Country?: string;
 
-  // @ApiPropertyOptional({ example: AppRole.USER, enum: AppRole, description: 'User role' })
-  // @IsOptional()
-  // role?: AppRole;
-
-  // @ApiPropertyOptional({ example: false, description: 'Account status (active/inactive)' })
-  // @IsOptional()
-  // @IsBoolean()
-  // status?: boolean;
-
-  @ApiPropertyOptional({ example: true, description: 'Allow push notifications' })
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Allow push notifications',
+  })
   @IsOptional()
   @IsBoolean()
   allowPushNotifications?: boolean;
 
-  @ApiPropertyOptional({ example: false, description: 'Allow SMS notifications' })
+  @ApiPropertyOptional({
+    example: false,
+    description: 'Allow SMS notifications',
+  })
   @IsOptional()
   @IsBoolean()
   allowSmsNotifications?: boolean;
 
-  @ApiPropertyOptional({ example: true, description: 'Allow email notifications' })
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Allow email notifications',
+  })
   @IsOptional()
   @IsBoolean()
   allowEmailNotifications?: boolean;
 
-  @ApiProperty()
-  profileImageUrl: string;
-
-  // Academic Background
-  @ApiPropertyOptional({ example: "Bachelor's Degree", description: 'Highest level of education' })
+  @ApiPropertyOptional({
+    example: 'https://example.com/profile.jpg',
+    description: 'User profile image URL',
+  })
   @IsOptional()
   @IsString()
-  highestEducation?: string;
+  profileImageUrl?: string;
 
-  @ApiPropertyOptional({ example: ['Engineering', 'Computer Science'], description: 'Fields of study' })
+  // Age Range
+  @ApiPropertyOptional({
+    example: '25-30',
+    enum: ['15-18', '19-24', '25-30', '31-40', '41+'],
+    description: 'Age range',
+  })
+  @IsOptional()
+  @IsString()
+  ageRange?: string;
+
+  // Academic Background
+  @ApiPropertyOptional({
+    example: "Bachelor's Degree",
+    description: 'Highest level of education',
+  })
+  @IsOptional()
+  @IsString()
+  highestLevelOfEducation?: string;
+
+  // @ApiPropertyOptional({
+  //   example: 'Engineering',
+  //   description: 'Field of study or major',
+  // })
+  // @IsOptional()
+  // @IsString()
+  // fieldOfStudy?: string;
+  @ApiPropertyOptional({
+    example: ['Engineering', 'Computer Science'],
+    description: 'Fields of study',
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  fieldsOfStudy?: string[];
+  fieldOfStudy?: string[];
 
-  @ApiPropertyOptional({ example: 'Harvard University', description: 'University or institution attended' })
+  @ApiPropertyOptional({
+    example: 'Harvard University',
+    description: 'University or institution attended',
+  })
   @IsOptional()
   @IsString()
   universityOrInstitution?: string;
 
   // Career Interests
-  @ApiPropertyOptional({ example: ['Technology', 'Finance'], description: 'Industries of interest' })
+  @ApiPropertyOptional({
+    example: 'Employed',
+    enum: [
+      'Student',
+      'Recent Graduate',
+      'Employed',
+      'Self-Employed',
+      'Career Transition',
+    ],
+    description: 'Current status',
+  })
+  @IsOptional()
+  @IsString()
+  currentStatus?: string;
+
+  @ApiPropertyOptional({
+    example: ['Technology', 'Finance'],
+    description: 'Industries of interest',
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   industriesOfInterest?: string[];
 
-  @ApiPropertyOptional({ example: 'Software Engineer', description: 'Current job title' })
+  @ApiPropertyOptional({
+    example: 'Software Engineer',
+    description: 'Current job title',
+  })
   @IsOptional()
   @IsString()
   currentJobTitle?: string;
 
-  @ApiPropertyOptional({ example: '5 years experience in web development', description: 'Career experience details' })
+  @ApiPropertyOptional({
+    example: '5 years experience in web development',
+    description: 'Career experience details',
+  })
   @IsOptional()
   @IsString()
   careerExperience?: string;
 
+  // Work Experience
+  @ApiPropertyOptional({
+    example: 'Yes',
+    description: 'Work or internship experience',
+  })
+  @IsOptional()
+  @IsString()
+  workExperience?: string;
+
+  @ApiPropertyOptional({
+    example: 'Building AI-powered applications',
+    description: 'What type of work excites the user',
+  })
+  @IsOptional()
+  @IsString()
+  excitingWork?: string;
+
+  // Skills
+  @ApiPropertyOptional({
+    example: ['JavaScript', 'Python'],
+    description: 'User technical skills',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  technicalSkills?: string[];
+
+  @ApiPropertyOptional({
+    example: ['Problem-solving', 'Communication'],
+    description: 'User soft skills',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  softSkills?: string[];
+
+  // Preferences
+  @ApiPropertyOptional({
+    example: ['Remote', 'Hybrid'],
+    description: 'Preferred work environments',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  preferredWorkEnvironments?: string[];
+
+  @ApiPropertyOptional({
+    example: ['Online courses', 'Workshops'],
+    description: 'Preferred learning methods',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  learningPreferences?: string[];
+
+  @ApiPropertyOptional({
+    example: ['Limited networking', 'Lack of mentorship'],
+    description: 'Challenges faced in career',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  careerChallenges?: string[];
+
+  // Future Aspirations
+  @ApiPropertyOptional({
+    example: 'Become a tech entrepreneur',
+    description: 'User future aspirations',
+  })
+  @IsOptional()
+  @IsString()
+  futureAspirations?: string;
+
+  @ApiPropertyOptional({
+    example: 'I would like mentorship in AI research.',
+    description: 'Additional information for career roadmap',
+  })
+  @IsOptional()
+  @IsString()
+  additionalInfo?: string;
+
   // Hobbies and Skills
-  @ApiPropertyOptional({ example: ['Coding', 'Football'], description: 'User hobbies' })
+  @ApiPropertyOptional({
+    example: ['Coding', 'Football'],
+    description: 'User hobbies',
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   hobbies?: string[];
 
-  @ApiPropertyOptional({ example: ['JavaScript', 'Python'], description: 'User skills' })
+  @ApiPropertyOptional({
+    example: ['JavaScript', 'Python'],
+    description: 'User skills',
+  })
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
   skills?: string[];
-
-  // Future Aspirations
-  @ApiPropertyOptional({ example: 'Become a tech entrepreneur', description: 'User future aspirations' })
-  @IsOptional()
-  @IsString()
-  futureAspirations?: string;
 }
+
 export class CreateUserDto {}
