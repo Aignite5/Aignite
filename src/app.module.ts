@@ -16,8 +16,8 @@ import { AzureOpenaiModule } from './azure-openai/azure-openai.module';
     MulterModule.register({ dest: './uploads' }),
     ScheduleModule.forRoot(),
     ThrottlerModule.forRoot({ ttl: 60, limit: 40 }),
-    MongooseModule.forRoot("mongodb+srv://aiignite:BpVsYnBDrH2WS5R@ai-ignite.mongocluster.cosmos.azure.com/?tls=true&authMechanism=SCRAM-SHA-256&retrywrites=false&maxIdleTimeMS=120000"),   
-    // MongooseModule.forRoot(String(process.env.MONGODB_URL).trim()),
+
+    MongooseModule.forRoot(String(process.env.MONGODB_URL).trim()),
     AuthModule,
     UsersModule,
     AzureOpenaiModule,
