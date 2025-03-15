@@ -36,6 +36,7 @@ import { ThirdPartyLoginDTO } from 'src/auth/dto/auth.dto';
 import { AppRole, AuthProvider } from 'src/utils/utils.constant';
 import { Users } from './schema/user.schema';
 import { AzureOpenaiService } from 'src/azure-openai/azure-openai.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class UsersService {
@@ -432,11 +433,11 @@ export class UsersService {
       }
 
          // Academic Background
-    if (payload.highestEducation && payload.highestEducation !== record.highestEducation) {
-      record.highestEducation = payload.highestEducation;
+    if (payload.highestLevelOfEducation && payload.highestLevelOfEducation !== record.highestLevelOfEducation) {
+      record.highestLevelOfEducation = payload.highestLevelOfEducation;
     }
-    if (payload.fieldsOfStudy && JSON.stringify(payload.fieldsOfStudy) !== JSON.stringify(record.fieldsOfStudy)) {
-      record.fieldsOfStudy = payload.fieldsOfStudy;
+    if (payload.fieldOfStudy && JSON.stringify(payload.fieldOfStudy) !== JSON.stringify(record.fieldOfStudy)) {
+      record.fieldOfStudy = payload.fieldOfStudy;
     }
     if (payload.universityOrInstitution && payload.universityOrInstitution !== record.universityOrInstitution) {
       record.universityOrInstitution = payload.universityOrInstitution;
@@ -465,6 +466,63 @@ export class UsersService {
     if (payload.futureAspirations && payload.futureAspirations !== record.futureAspirations) {
       record.futureAspirations = payload.futureAspirations;
     }
+        // Academic Background
+        if (payload.highestLevelOfEducation && payload.highestLevelOfEducation !== record.highestLevelOfEducation) {
+          record.highestLevelOfEducation = payload.highestLevelOfEducation;
+        }
+        if (payload.fieldOfStudy && JSON.stringify(payload.fieldOfStudy) !== JSON.stringify(record.fieldOfStudy)) {
+          record.fieldOfStudy = payload.fieldOfStudy;
+        }
+        if (payload.universityOrInstitution && payload.universityOrInstitution !== record.universityOrInstitution) {
+          record.universityOrInstitution = payload.universityOrInstitution;
+        }
+    
+        // Career Interests & Work Experience
+        if (payload.currentStatus && payload.currentStatus !== record.currentStatus) {
+          record.currentStatus = payload.currentStatus;
+        }
+        if (payload.industriesOfInterest && JSON.stringify(payload.industriesOfInterest) !== JSON.stringify(record.industriesOfInterest)) {
+          record.industriesOfInterest = payload.industriesOfInterest;
+        }
+        if (payload.currentJobTitle && payload.currentJobTitle !== record.currentJobTitle) {
+          record.currentJobTitle = payload.currentJobTitle;
+        }
+        if (payload.careerExperience && payload.careerExperience !== record.careerExperience) {
+          record.careerExperience = payload.careerExperience;
+        }
+        if (payload.workExperience && payload.workExperience !== record.workExperience) {
+          record.workExperience = payload.workExperience;
+        }
+        if (payload.excitingWork && payload.excitingWork !== record.excitingWork) {
+          record.excitingWork = payload.excitingWork;
+        }
+    
+        // Skills
+        if (payload.technicalSkills && JSON.stringify(payload.technicalSkills) !== JSON.stringify(record.technicalSkills)) {
+          record.technicalSkills = payload.technicalSkills;
+        }
+        if (payload.softSkills && JSON.stringify(payload.softSkills) !== JSON.stringify(record.softSkills)) {
+          record.softSkills = payload.softSkills;
+        }
+    
+        // Preferences
+        if (payload.preferredWorkEnvironments && JSON.stringify(payload.preferredWorkEnvironments) !== JSON.stringify(record.preferredWorkEnvironments)) {
+          record.preferredWorkEnvironments = payload.preferredWorkEnvironments;
+        }
+        if (payload.learningPreferences && JSON.stringify(payload.learningPreferences) !== JSON.stringify(record.learningPreferences)) {
+          record.learningPreferences = payload.learningPreferences;
+        }
+        if (payload.careerChallenges && JSON.stringify(payload.careerChallenges) !== JSON.stringify(record.careerChallenges)) {
+          record.careerChallenges = payload.careerChallenges;
+        }
+    
+        // Future Aspirations & Additional Info
+        if (payload.futureAspirations && payload.futureAspirations !== record.futureAspirations) {
+          record.futureAspirations = payload.futureAspirations;
+        }
+        if (payload.additionalInfo && payload.additionalInfo !== record.additionalInfo) {
+          record.additionalInfo = payload.additionalInfo;
+        }
   
       const updatedUser = await record.save();
       return {
@@ -478,5 +536,126 @@ export class UsersService {
       throw ex;
     }
   }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async remindUsersToCompleteProfile() {
+    const users = await this.UsersModel.find({
+      $or: [
+        { highestLevelOfEducation: { $exists: false, $eq: null } },
+        { fieldOfStudy: { $exists: false, $eq: [] } },
+        { universityOrInstitution: { $exists: false, $eq: null } },
+        { industriesOfInterest: { $exists: false, $eq: [] } },
+        { currentJobTitle: { $exists: false, $eq: null } },
+        { careerExperience: { $exists: false, $eq: null } },
+        { hobbies: { $exists: false, $eq: [] } },
+        { skills: { $exists: false, $eq: [] } },
+        { futureAspirations: { $exists: false, $eq: null } },
+      ]
+    });
+
+    if (users.length === 0) {
+      console.log('✅ No users to remind.');
+      return;
+    }
+
+    for (const user of users) {
+      if (!user.email) continue; // Skip users without email
+
+      // Identify missing fields dynamically
+      const missingFields = [];
+      if (!user.highestLevelOfEducation) missingFields.push('Highest Education');
+      if (!user.fieldOfStudy || user.fieldOfStudy.length === 0) missingFields.push('Fields of Study');
+      if (!user.universityOrInstitution) missingFields.push('University/Institution');
+      if (!user.industriesOfInterest || user.industriesOfInterest.length === 0) missingFields.push('Industries of Interest');
+      if (!user.currentJobTitle) missingFields.push('Current Job Title');
+      if (!user.careerExperience) missingFields.push('Career Experience');
+      if (!user.hobbies || user.hobbies.length === 0) missingFields.push('Hobbies');
+      if (!user.skills || user.skills.length === 0) missingFields.push('Skills');
+      if (!user.futureAspirations) missingFields.push('Future Aspirations');
+
+      const emailTemplate = `
+        <p>Dear ${user.firstName || 'User'},</p>
+        <h3>🚀 Complete Your Profile to Get Your Personalized Career Blueprint</h3>
+        <p>We noticed that your profile is missing some important details. Completing these fields will help us generate a tailored career blueprint for you.</p>
+        <p><strong>📝 Missing Fields:</strong></p>
+        <ul>
+          ${missingFields.map(field => `<li>${field}</li>`).join('')}
+        </ul>
+        <p>Click below to update your profile:</p>
+        <a href="https://yourapp.com/profile/edit" style="background-color: #008CBA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Update Profile</a>
+        <p>Thank you!</p>
+      `;
+
+      await sendEmail(emailTemplate, 'Complete Your Profile', [user.email]);
+      console.log(`📧 Reminder email sent to ${user.email}`);
+    }
+  }
+
+
+
+  // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  // async SocketremindUsersToCompleteProfile() {
+  //   const users = await this.UsersModel.find({
+  //     $or: [
+  //       { highestLevelOfEducation: { $exists: false, $eq: null } },
+  //       { fieldOfStudy: { $exists: false, $eq: [] } },
+  //       { universityOrInstitution: { $exists: false, $eq: null } },
+  //       { industriesOfInterest: { $exists: false, $eq: [] } },
+  //       { currentJobTitle: { $exists: false, $eq: null } },
+  //       { careerExperience: { $exists: false, $eq: null } },
+  //       { hobbies: { $exists: false, $eq: [] } },
+  //       { skills: { $exists: false, $eq: [] } },
+  //       { futureAspirations: { $exists: false, $eq: null } },
+  //     ]
+  //   });
+
+  //   if (users.length === 0) {
+  //     console.log('✅ No users to remind.');
+  //     return;
+  //   }
+
+  //   for (const user of users) {
+  //     if (!user.email) continue;
+
+  //     // Identify missing fields dynamically
+  //     const missingFields = [];
+  //     if (!user.highestLevelOfEducation) missingFields.push('Highest Education');
+  //     if (!user.fieldOfStudy || user.fieldOfStudy.length === 0) missingFields.push('Fields of Study');
+  //     if (!user.universityOrInstitution) missingFields.push('University/Institution');
+  //     if (!user.industriesOfInterest || user.industriesOfInterest.length === 0) missingFields.push('Industries of Interest');
+  //     if (!user.currentJobTitle) missingFields.push('Current Job Title');
+  //     if (!user.careerExperience) missingFields.push('Career Experience');
+  //     if (!user.hobbies || user.hobbies.length === 0) missingFields.push('Hobbies');
+  //     if (!user.skills || user.skills.length === 0) missingFields.push('Skills');
+  //     if (!user.futureAspirations) missingFields.push('Future Aspirations');
+
+  //     // Prepare the notification message
+  //     const notificationMessage = `🔔 Reminder: Please complete your profile. Missing fields: ${missingFields.join(', ')}`;
+
+  //     // Send real-time socket notification
+  //     this.notificationsGateway.sendNotification(user.email, {
+  //       title: 'Complete Your Profile',
+  //       message: notificationMessage,
+  //       actionUrl: 'https://yourapp.com/profile/edit',
+  //     });
+
+  //     // Send email reminder
+  //     const emailTemplate = `
+  //       <p>Dear ${user.firstName || 'User'},</p>
+  //       <h3>🚀 Complete Your Profile to Get Your Personalized Career Blueprint</h3>
+  //       <p>We noticed that your profile is missing some important details. Completing these fields will help us generate a tailored career blueprint for you.</p>
+  //       <p><strong>📝 Missing Fields:</strong></p>
+  //       <ul>
+  //         ${missingFields.map(field => `<li>${field}</li>`).join('')}
+  //       </ul>
+  //       <p>Click below to update your profile:</p>
+  //       <a href="https://yourapp.com/profile/edit" style="background-color: #008CBA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Update Profile</a>
+  //       <p>Thank you!</p>
+  //     `;
+
+  //     await sendEmail(emailTemplate, 'Complete Your Profile', [user.email]);
+  //     console.log(`📧 Reminder email & 📡 Socket notification sent to ${user.email}`);
+  //   }
+  // }
 
 }

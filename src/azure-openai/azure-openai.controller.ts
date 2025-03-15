@@ -38,4 +38,18 @@ export class AzureOpenaiController {
   async generateCareerBlueprint(@Param('id') userId: string) {
     return await this.azureOpenaiService.generateCareerBlueprint(userId);
   }
+
+  @Get('inhouse/:id/career-blueprint')
+  @ApiOperation({ summary: 'Generate Career Blueprint' })
+  @ApiResponse({
+    status: 200,
+    description: 'Career blueprint generated successfully',
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found',
+  })
+  async generateCareerBlueprintInHouse(@Param('id') userId: string) {
+    return await this.azureOpenaiService.generateCareerBlueprintInHouse(userId);
+  }
 }
