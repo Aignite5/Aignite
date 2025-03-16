@@ -14,7 +14,6 @@ import {
   CreateUserDto,
   UpdateUserDto,
   UserDto,
-
 } from './dto/user.dto';
 import { InjectModel } from '@nestjs/mongoose';
 import mongoose, { Model } from 'mongoose';
@@ -50,7 +49,6 @@ export class UsersService {
     @InjectModel(Users.name) private readonly UsersModel: Model<Users>,
     // private readonly OpenAiSrv: AzureOpenaiService,
   ) {}
-
 
   async createuser(
     CreateUser: CreateAccountDto, // : Promise<User>
@@ -160,9 +158,8 @@ export class UsersService {
     const verificationCode = generateUniqueKey(4);
     try {
       let user = await this.UsersModel.findOne({
-        email: email.toLocaleLowerCase(),
+        email: email.toLowerCase(),
       }).exec();
-      console.log(user);
 
       if (user && (await verifyPasswordHash(password, user.password))) {
         // Update the verification code
@@ -177,6 +174,20 @@ export class UsersService {
         // Save the updated user
         await user.save();
 
+        // If user status is false, send a verification email
+        if (!user.status) {
+          const htmlEmailTemplate = `
+          <p>Please copy the code below to verify your account</p>
+          <h3>${verificationCode}</h3>
+        `;
+          await sendEmail(htmlEmailTemplate, 'Verify Account', [user.email]);
+          return {
+            success: true,
+            code: user,
+            message: 'Token has been resent',
+          };
+        }
+
         return {
           success: true,
           code: HttpStatus.OK,
@@ -187,11 +198,50 @@ export class UsersService {
 
       throw new NotFoundException('Invalid credentials');
     } catch (ex) {
-      // Handle errors as needed
       console.error('Error finding user:', ex);
       throw ex;
     }
   }
+
+  // async findUserByEmailAndPasswordAndUpdateVerificationcode(
+  //   email: string,
+  //   password: string,
+  // ): Promise<any> {
+  //   const verificationCode = generateUniqueKey(4);
+  //   try {
+  //     let user = await this.UsersModel.findOne({
+  //       email: email.toLocaleLowerCase(),
+  //     }).exec();
+  //     console.log(user);
+
+  //     if (user && (await verifyPasswordHash(password, user.password))) {
+  //       // Update the verification code
+  //       user.uniqueVerificationCode = verificationCode;
+
+  //       // Update Last_sign_in with the current date
+  //       user.Last_sign_in = new Date();
+
+  //       // Increment Sign_in_counts
+  //       user.Sign_in_counts = (user.Sign_in_counts || 0) + 1;
+
+  //       // Save the updated user
+  //       await user.save();
+
+  //       return {
+  //         success: true,
+  //         code: HttpStatus.OK,
+  //         data: user,
+  //         message: 'User found',
+  //       };
+  //     }
+
+  //     throw new NotFoundException('Invalid credentials');
+  //   } catch (ex) {
+  //     // Handle errors as needed
+  //     console.error('Error finding user:', ex);
+  //     throw ex;
+  //   }
+  // }
 
   async verifyCodeAfterSignuporLogin(
     uniqueVerificationCode: string,
@@ -370,7 +420,6 @@ export class UsersService {
     }
   }
 
-  
   async updateUser(
     userId: string,
     payload: UpdateUserDto,
@@ -432,98 +481,181 @@ export class UsersService {
         record.profileImageUrl = payload.profileImageUrl;
       }
 
-         // Academic Background
-    if (payload.highestLevelOfEducation && payload.highestLevelOfEducation !== record.highestLevelOfEducation) {
-      record.highestLevelOfEducation = payload.highestLevelOfEducation;
-    }
-    if (payload.fieldOfStudy && JSON.stringify(payload.fieldOfStudy) !== JSON.stringify(record.fieldOfStudy)) {
-      record.fieldOfStudy = payload.fieldOfStudy;
-    }
-    if (payload.universityOrInstitution && payload.universityOrInstitution !== record.universityOrInstitution) {
-      record.universityOrInstitution = payload.universityOrInstitution;
-    }
+      // Academic Background
+      if (
+        payload.highestLevelOfEducation &&
+        payload.highestLevelOfEducation !== record.highestLevelOfEducation
+      ) {
+        record.highestLevelOfEducation = payload.highestLevelOfEducation;
+      }
+      if (
+        payload.fieldOfStudy &&
+        JSON.stringify(payload.fieldOfStudy) !==
+          JSON.stringify(record.fieldOfStudy)
+      ) {
+        record.fieldOfStudy = payload.fieldOfStudy;
+      }
+      if (
+        payload.universityOrInstitution &&
+        payload.universityOrInstitution !== record.universityOrInstitution
+      ) {
+        record.universityOrInstitution = payload.universityOrInstitution;
+      }
 
-    // Career Interests
-    if (payload.industriesOfInterest && JSON.stringify(payload.industriesOfInterest) !== JSON.stringify(record.industriesOfInterest)) {
-      record.industriesOfInterest = payload.industriesOfInterest;
-    }
-    if (payload.currentJobTitle && payload.currentJobTitle !== record.currentJobTitle) {
-      record.currentJobTitle = payload.currentJobTitle;
-    }
-    if (payload.careerExperience && payload.careerExperience !== record.careerExperience) {
-      record.careerExperience = payload.careerExperience;
-    }
+      // Career Interests
+      if (
+        payload.industriesOfInterest &&
+        JSON.stringify(payload.industriesOfInterest) !==
+          JSON.stringify(record.industriesOfInterest)
+      ) {
+        record.industriesOfInterest = payload.industriesOfInterest;
+      }
+      if (
+        payload.currentJobTitle &&
+        payload.currentJobTitle !== record.currentJobTitle
+      ) {
+        record.currentJobTitle = payload.currentJobTitle;
+      }
+      if (
+        payload.careerExperience &&
+        payload.careerExperience !== record.careerExperience
+      ) {
+        record.careerExperience = payload.careerExperience;
+      }
 
-    // Hobbies & Skills
-    if (payload.hobbies && JSON.stringify(payload.hobbies) !== JSON.stringify(record.hobbies)) {
-      record.hobbies = payload.hobbies;
-    }
-    if (payload.skills && JSON.stringify(payload.skills) !== JSON.stringify(record.skills)) {
-      record.skills = payload.skills;
-    }
+      // Hobbies & Skills
+      if (
+        payload.hobbies &&
+        JSON.stringify(payload.hobbies) !== JSON.stringify(record.hobbies)
+      ) {
+        record.hobbies = payload.hobbies;
+      }
+      if (
+        payload.skills &&
+        JSON.stringify(payload.skills) !== JSON.stringify(record.skills)
+      ) {
+        record.skills = payload.skills;
+      }
 
-    // Future Aspirations
-    if (payload.futureAspirations && payload.futureAspirations !== record.futureAspirations) {
-      record.futureAspirations = payload.futureAspirations;
-    }
-        // Academic Background
-        if (payload.highestLevelOfEducation && payload.highestLevelOfEducation !== record.highestLevelOfEducation) {
-          record.highestLevelOfEducation = payload.highestLevelOfEducation;
-        }
-        if (payload.fieldOfStudy && JSON.stringify(payload.fieldOfStudy) !== JSON.stringify(record.fieldOfStudy)) {
-          record.fieldOfStudy = payload.fieldOfStudy;
-        }
-        if (payload.universityOrInstitution && payload.universityOrInstitution !== record.universityOrInstitution) {
-          record.universityOrInstitution = payload.universityOrInstitution;
-        }
-    
-        // Career Interests & Work Experience
-        if (payload.currentStatus && payload.currentStatus !== record.currentStatus) {
-          record.currentStatus = payload.currentStatus;
-        }
-        if (payload.industriesOfInterest && JSON.stringify(payload.industriesOfInterest) !== JSON.stringify(record.industriesOfInterest)) {
-          record.industriesOfInterest = payload.industriesOfInterest;
-        }
-        if (payload.currentJobTitle && payload.currentJobTitle !== record.currentJobTitle) {
-          record.currentJobTitle = payload.currentJobTitle;
-        }
-        if (payload.careerExperience && payload.careerExperience !== record.careerExperience) {
-          record.careerExperience = payload.careerExperience;
-        }
-        if (payload.workExperience && payload.workExperience !== record.workExperience) {
-          record.workExperience = payload.workExperience;
-        }
-        if (payload.excitingWork && payload.excitingWork !== record.excitingWork) {
-          record.excitingWork = payload.excitingWork;
-        }
-    
-        // Skills
-        if (payload.technicalSkills && JSON.stringify(payload.technicalSkills) !== JSON.stringify(record.technicalSkills)) {
-          record.technicalSkills = payload.technicalSkills;
-        }
-        if (payload.softSkills && JSON.stringify(payload.softSkills) !== JSON.stringify(record.softSkills)) {
-          record.softSkills = payload.softSkills;
-        }
-    
-        // Preferences
-        if (payload.preferredWorkEnvironments && JSON.stringify(payload.preferredWorkEnvironments) !== JSON.stringify(record.preferredWorkEnvironments)) {
-          record.preferredWorkEnvironments = payload.preferredWorkEnvironments;
-        }
-        if (payload.learningPreferences && JSON.stringify(payload.learningPreferences) !== JSON.stringify(record.learningPreferences)) {
-          record.learningPreferences = payload.learningPreferences;
-        }
-        if (payload.careerChallenges && JSON.stringify(payload.careerChallenges) !== JSON.stringify(record.careerChallenges)) {
-          record.careerChallenges = payload.careerChallenges;
-        }
-    
-        // Future Aspirations & Additional Info
-        if (payload.futureAspirations && payload.futureAspirations !== record.futureAspirations) {
-          record.futureAspirations = payload.futureAspirations;
-        }
-        if (payload.additionalInfo && payload.additionalInfo !== record.additionalInfo) {
-          record.additionalInfo = payload.additionalInfo;
-        }
-  
+      // Future Aspirations
+      if (
+        payload.futureAspirations &&
+        payload.futureAspirations !== record.futureAspirations
+      ) {
+        record.futureAspirations = payload.futureAspirations;
+      }
+      // Academic Background
+      if (
+        payload.highestLevelOfEducation &&
+        payload.highestLevelOfEducation !== record.highestLevelOfEducation
+      ) {
+        record.highestLevelOfEducation = payload.highestLevelOfEducation;
+      }
+      if (
+        payload.fieldOfStudy &&
+        JSON.stringify(payload.fieldOfStudy) !==
+          JSON.stringify(record.fieldOfStudy)
+      ) {
+        record.fieldOfStudy = payload.fieldOfStudy;
+      }
+      if (
+        payload.universityOrInstitution &&
+        payload.universityOrInstitution !== record.universityOrInstitution
+      ) {
+        record.universityOrInstitution = payload.universityOrInstitution;
+      }
+
+      // Career Interests & Work Experience
+      if (
+        payload.currentStatus &&
+        payload.currentStatus !== record.currentStatus
+      ) {
+        record.currentStatus = payload.currentStatus;
+      }
+      if (
+        payload.industriesOfInterest &&
+        JSON.stringify(payload.industriesOfInterest) !==
+          JSON.stringify(record.industriesOfInterest)
+      ) {
+        record.industriesOfInterest = payload.industriesOfInterest;
+      }
+      if (
+        payload.currentJobTitle &&
+        payload.currentJobTitle !== record.currentJobTitle
+      ) {
+        record.currentJobTitle = payload.currentJobTitle;
+      }
+      if (
+        payload.careerExperience &&
+        payload.careerExperience !== record.careerExperience
+      ) {
+        record.careerExperience = payload.careerExperience;
+      }
+      if (
+        payload.workExperience &&
+        payload.workExperience !== record.workExperience
+      ) {
+        record.workExperience = payload.workExperience;
+      }
+      if (
+        payload.excitingWork &&
+        payload.excitingWork !== record.excitingWork
+      ) {
+        record.excitingWork = payload.excitingWork;
+      }
+
+      // Skills
+      if (
+        payload.technicalSkills &&
+        JSON.stringify(payload.technicalSkills) !==
+          JSON.stringify(record.technicalSkills)
+      ) {
+        record.technicalSkills = payload.technicalSkills;
+      }
+      if (
+        payload.softSkills &&
+        JSON.stringify(payload.softSkills) !== JSON.stringify(record.softSkills)
+      ) {
+        record.softSkills = payload.softSkills;
+      }
+
+      // Preferences
+      if (
+        payload.preferredWorkEnvironments &&
+        JSON.stringify(payload.preferredWorkEnvironments) !==
+          JSON.stringify(record.preferredWorkEnvironments)
+      ) {
+        record.preferredWorkEnvironments = payload.preferredWorkEnvironments;
+      }
+      if (
+        payload.learningPreferences &&
+        JSON.stringify(payload.learningPreferences) !==
+          JSON.stringify(record.learningPreferences)
+      ) {
+        record.learningPreferences = payload.learningPreferences;
+      }
+      if (
+        payload.careerChallenges &&
+        JSON.stringify(payload.careerChallenges) !==
+          JSON.stringify(record.careerChallenges)
+      ) {
+        record.careerChallenges = payload.careerChallenges;
+      }
+
+      // Future Aspirations & Additional Info
+      if (
+        payload.futureAspirations &&
+        payload.futureAspirations !== record.futureAspirations
+      ) {
+        record.futureAspirations = payload.futureAspirations;
+      }
+      if (
+        payload.additionalInfo &&
+        payload.additionalInfo !== record.additionalInfo
+      ) {
+        record.additionalInfo = payload.additionalInfo;
+      }
+
       const updatedUser = await record.save();
       return {
         // data:updatedUser,
@@ -550,7 +682,7 @@ export class UsersService {
         { hobbies: { $exists: false, $eq: [] } },
         { skills: { $exists: false, $eq: [] } },
         { futureAspirations: { $exists: false, $eq: null } },
-      ]
+      ],
     });
 
     if (users.length === 0) {
@@ -563,14 +695,20 @@ export class UsersService {
 
       // Identify missing fields dynamically
       const missingFields = [];
-      if (!user.highestLevelOfEducation) missingFields.push('Highest Education');
-      if (!user.fieldOfStudy || user.fieldOfStudy.length === 0) missingFields.push('Fields of Study');
-      if (!user.universityOrInstitution) missingFields.push('University/Institution');
-      if (!user.industriesOfInterest || user.industriesOfInterest.length === 0) missingFields.push('Industries of Interest');
+      if (!user.highestLevelOfEducation)
+        missingFields.push('Highest Education');
+      if (!user.fieldOfStudy || user.fieldOfStudy.length === 0)
+        missingFields.push('Fields of Study');
+      if (!user.universityOrInstitution)
+        missingFields.push('University/Institution');
+      if (!user.industriesOfInterest || user.industriesOfInterest.length === 0)
+        missingFields.push('Industries of Interest');
       if (!user.currentJobTitle) missingFields.push('Current Job Title');
       if (!user.careerExperience) missingFields.push('Career Experience');
-      if (!user.hobbies || user.hobbies.length === 0) missingFields.push('Hobbies');
-      if (!user.skills || user.skills.length === 0) missingFields.push('Skills');
+      if (!user.hobbies || user.hobbies.length === 0)
+        missingFields.push('Hobbies');
+      if (!user.skills || user.skills.length === 0)
+        missingFields.push('Skills');
       if (!user.futureAspirations) missingFields.push('Future Aspirations');
 
       const emailTemplate = `
@@ -579,7 +717,7 @@ export class UsersService {
         <p>We noticed that your profile is missing some important details. Completing these fields will help us generate a tailored career blueprint for you.</p>
         <p><strong>📝 Missing Fields:</strong></p>
         <ul>
-          ${missingFields.map(field => `<li>${field}</li>`).join('')}
+          ${missingFields.map((field) => `<li>${field}</li>`).join('')}
         </ul>
         <p>Click below to update your profile:</p>
         <a href="https://yourapp.com/profile/edit" style="background-color: #008CBA; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">Update Profile</a>
@@ -590,8 +728,6 @@ export class UsersService {
       console.log(`📧 Reminder email sent to ${user.email}`);
     }
   }
-
-
 
   // @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
   // async SocketremindUsersToCompleteProfile() {
@@ -657,5 +793,4 @@ export class UsersService {
   //     console.log(`📧 Reminder email & 📡 Socket notification sent to ${user.email}`);
   //   }
   // }
-
 }
