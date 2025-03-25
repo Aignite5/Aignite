@@ -794,12 +794,6 @@ export class UsersService {
   //   }
   // }
 
-  /**
-   * Get all users with pagination
-   * @param page Page number
-   * @param limit Number of users per page
-   * @returns Paginated users
-   */
   async getAllUsers(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
     const users = await this.UsersModel.find().skip(skip).limit(limit).exec();
@@ -813,12 +807,40 @@ export class UsersService {
     };
   }
 
-  /**
-   * Count registered users per day within a start and end date
-   * @param startDate Start date (YYYY-MM-DD)
-   * @param endDate End date (YYYY-MM-DD)
-   * @returns Users count per day
-   */
+  async getAllUsersSearch(
+    page: number = 1,
+    limit: number = 10,
+    searchQuery?: string,
+  ) {
+    const skip = (page - 1) * limit;
+    const query: any = {};
+
+    // Enable wildcard search on firstName, lastName, email, and phoneNumber
+    if (searchQuery) {
+      query.$or = [
+        { firstName: { $regex: searchQuery, $options: 'i' } },
+        { lastName: { $regex: searchQuery, $options: 'i' } },
+        { email: { $regex: searchQuery, $options: 'i' } },
+        { phoneNumber: { $regex: searchQuery, $options: 'i' } },
+      ];
+    }
+
+    // Fetch users
+    const users = await this.UsersModel.find(query).skip(skip).limit(limit).exec();
+
+    // Count total users that match the search (for pagination)
+    const total = await this.UsersModel.countDocuments(query).exec();
+
+    return {
+      success: true,
+      total,
+      page,
+      limit,
+      data: users,
+    };
+  }
+
+
   async countRegisteredUsersPerDay(startDate: string, endDate: string) {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -844,10 +866,7 @@ export class UsersService {
     };
   }
 
-  /**
-   * Calculate weekly percentage increase or decrease in registered users
-   * @returns Percentage increase or decrease
-   */
+
   async getWeeklyUserGrowth() {
     const today = new Date();
     const lastWeekStart = new Date(today);
@@ -887,12 +906,7 @@ export class UsersService {
     };
   }
 
-  /**
-   * Get users who have not filled all academic background info (with pagination)
-   * @param page Page number
-   * @param limit Number of users per page
-   * @returns Users missing academic information
-   */
+
   async getUsersWithIncompleteAcademicBackground(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
     const users = await this.UsersModel
