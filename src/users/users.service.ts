@@ -669,7 +669,7 @@ export class UsersService {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  @Cron(CronExpression.EVERY_WEEK)
   async remindUsersToCompleteProfile() {
     const users = await this.UsersModel.find({
       $or: [
@@ -793,4 +793,134 @@ export class UsersService {
   //     console.log(`📧 Reminder email & 📡 Socket notification sent to ${user.email}`);
   //   }
   // }
+
+  /**
+   * Get all users with pagination
+   * @param page Page number
+   * @param limit Number of users per page
+   * @returns Paginated users
+   */
+  async getAllUsers(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const users = await this.UsersModel.find().skip(skip).limit(limit).exec();
+    const totalUsers = await this.UsersModel.countDocuments();
+    return {
+      success: true,
+      totalUsers,
+      totalPages: Math.ceil(totalUsers / limit),
+      currentPage: page,
+      users,
+    };
+  }
+
+  /**
+   * Count registered users per day within a start and end date
+   * @param startDate Start date (YYYY-MM-DD)
+   * @param endDate End date (YYYY-MM-DD)
+   * @returns Users count per day
+   */
+  async countRegisteredUsersPerDay(startDate: string, endDate: string) {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    const results = await this.UsersModel.aggregate([
+      {
+        $match: {
+          createdDate: { $gte: start, $lte: end },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdDate" } },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    return {
+      success: true,
+      data: results,
+    };
+  }
+
+  /**
+   * Calculate weekly percentage increase or decrease in registered users
+   * @returns Percentage increase or decrease
+   */
+  async getWeeklyUserGrowth() {
+    const today = new Date();
+    const lastWeekStart = new Date(today);
+    lastWeekStart.setDate(today.getDate() - 14); // 2 weeks ago
+    const lastWeekEnd = new Date(today);
+    lastWeekEnd.setDate(today.getDate() - 7); // 1 week ago
+
+    const thisWeekStart = new Date(today);
+    thisWeekStart.setDate(today.getDate() - 7); // Start of this week
+    const thisWeekEnd = today;
+
+    const [lastWeek, thisWeek] = await Promise.all([
+      this.UsersModel.countDocuments({
+        createdDate: { $gte: lastWeekStart, $lte: lastWeekEnd },
+      }),
+      this.UsersModel.countDocuments({
+        createdDate: { $gte: thisWeekStart, $lte: thisWeekEnd },
+      }),
+    ]);
+
+    if (lastWeek === 0) {
+      return {
+        success: true,
+        percentageChange: thisWeek > 0 ? 100 : 0,
+        message: 'No users registered last week for comparison.',
+      };
+    }
+
+    const percentageChange = ((thisWeek - lastWeek) / lastWeek) * 100;
+
+    return {
+      success: true,
+      lastWeek,
+      thisWeek,
+      percentageChange,
+      message: `User registration has ${percentageChange >= 0 ? 'increased' : 'decreased'} %`,
+    };
+  }
+
+  /**
+   * Get users who have not filled all academic background info (with pagination)
+   * @param page Page number
+   * @param limit Number of users per page
+   * @returns Users missing academic information
+   */
+  async getUsersWithIncompleteAcademicBackground(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+    const users = await this.UsersModel
+      .find({
+        $or: [
+          { highestLevelOfEducation: { $exists: false, $eq: null } },
+          { fieldOfStudy: { $exists: false, $size: 0 } },
+          { universityOrInstitution: { $exists: false, $eq: null } },
+        ],
+      })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    const totalUsers = await this.UsersModel.countDocuments({
+      $or: [
+        { highestLevelOfEducation: { $exists: false, $eq: null } },
+        { fieldOfStudy: { $exists: false, $size: 0 } },
+        { universityOrInstitution: { $exists: false, $eq: null } },
+      ],
+    });
+
+    return {
+      success: true,
+      totalUsers,
+      totalPages: Math.ceil(totalUsers / limit),
+      currentPage: page,
+      users,
+    };
+  }
 }

@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
-import { ApiConsumes, ApiNotFoundResponse, ApiOperation, ApiParam, ApiProduces, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiConsumes, ApiNotFoundResponse, ApiOperation, ApiParam, ApiProduces, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdatePasswordDTO } from 'src/utils/utils.types';
 import { OTPUserDTO } from 'src/auth/dto/auth.dto';
 
@@ -93,5 +93,43 @@ export class UsersController {
     @Body() updateUser: UpdateUserDto,
   ): Promise<any> {
     return this.usersService.updateUser(userId, updateUser);
+  }
+
+
+
+  @Get("admin/allusers")
+  @ApiOperation({ summary: 'Get all users with pagination' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  async getAllUsers(@Query('page') page: number, @Query('limit') limit: number) {
+    return this.usersService.getAllUsers(page, limit);
+  }
+
+  @Get('admin/allusers/count-per-day')
+  @ApiOperation({ summary: 'Count registered users per day within a date range' })
+  @ApiQuery({ name: 'startDate', type: String, example: '2024-02-01' })
+  @ApiQuery({ name: 'endDate', type: String, example: '2024-02-10' })
+  async countRegisteredUsersPerDay(
+    @Query('startDate') startDate: string,
+    @Query('endDate') endDate: string,
+  ) {
+    return this.usersService.countRegisteredUsersPerDay(startDate, endDate);
+  }
+
+  @Get('admin/allusers/weekly-growth')
+  @ApiOperation({ summary: 'Get percentage increase/decrease in registered users from last week' })
+  async getWeeklyUserGrowth() {
+    return this.usersService.getWeeklyUserGrowth();
+  }
+
+  @Get('admin/allusers/incomplete-academic')
+  @ApiOperation({ summary: 'Get users with incomplete academic background (with pagination)' })
+  @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
+  @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
+  async getUsersWithIncompleteAcademicBackground(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
+    return this.usersService.getUsersWithIncompleteAcademicBackground(page, limit);
   }
 }
