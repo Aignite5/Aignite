@@ -105,6 +105,19 @@ export class UsersController {
     return this.usersService.getAllUsers(page, limit);
   }
 
+  @Get('admin/allusers/with-wild-card-search')
+  @ApiOperation({ summary: 'Get all users with pagination and wildcard search' })
+  @ApiQuery({ name: 'page', required: false, example: 1, description: 'Page number (default: 1)' })
+  @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Number of users per page (default: 10)' })
+  @ApiQuery({ name: 'search', required: false, example: 'john', description: 'Wildcard search by name, email, or phone' })
+  async getAllUsersSearch(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('search') searchQuery?: string,
+  ) {
+    return this.usersService.getAllUsersSearch(Number(page), Number(limit), searchQuery);
+  }
+
   @Get('admin/allusers/count-per-day')
   @ApiOperation({ summary: 'Count registered users per day within a date range' })
   @ApiQuery({ name: 'startDate', type: String, example: '2024-02-01' })
