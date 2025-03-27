@@ -79,7 +79,8 @@ export class Users {
   
   // Academic Background
   @ApiProperty()
-  @Prop({ enum: ['O-Level', 'Diploma', 'Bachelor’s', 'Master’s and above'] })
+  // @Prop({ enum: ['O-Level', 'Diploma', 'Bachelor’s', 'Master’s and above'] })
+  @Prop()
   highestLevelOfEducation: string; // Updated field name
 
   @ApiProperty()
@@ -99,15 +100,16 @@ export class Users {
 
   // Career Interests
   @ApiProperty()
-  @Prop({
-    enum: [
-      'Student',
-      'Recent Graduate',
-      'Employed',
-      'Self-Employed',
-      'Career Transition',
-    ],
-  })
+  // @Prop({
+  //   enum: [
+  //     'Student',
+  //     'Recent Graduate',
+  //     'Employed',
+  //     'Self-Employed',
+  //     'Career Transition',
+  //   ],
+  // })
+  @Prop()
   currentStatus: string;
 
   @ApiProperty()
