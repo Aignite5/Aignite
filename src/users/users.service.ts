@@ -952,4 +952,32 @@ export class UsersService {
       users,
     };
   }
+
+
+  async deleteUserById(userId: string) {
+    const user = await this.UsersModel.findByIdAndDelete(userId).exec();
+    if (!user) throw new NotFoundException('User not found');
+    return { success: true, message: 'User deleted successfully' };
+  }
+
+  /**
+   * 📌 Suspend or unsuspend a user
+   */
+  async updateUserStatus(userId: string, status: boolean) {
+    const user = await this.UsersModel.findByIdAndUpdate(userId, { status }, { new: true }).exec();
+    if (!user) throw new NotFoundException('User not found');
+    return {
+      success: true,
+      message: status ? 'User suspended successfully' : 'User unsuspended successfully',
+      data: user,
+    };
+  }
+
+  /**
+   * 📌 Get each user's login count
+   */
+  async getUserLoginCounts() {
+    const users = await this.UsersModel.find({}, { firstName: 1, lastName: 1, email: 1, sign_in_counts: 1 }).exec();
+    return { success: true, total: users.length, data: users };
+  }
 }

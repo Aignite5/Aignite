@@ -145,4 +145,31 @@ export class UsersController {
   ) {
     return this.usersService.getUsersWithIncompleteAcademicBackground(page, limit);
   }
+
+  @Delete(':id')
+  @ApiOperation({ summary: 'Delete a user by ID' })
+  @ApiParam({ name: 'id', required: true, example: '65d1fbb8397a4b1b3d4e9f6a', description: 'User ID' })
+  async deleteUser(@Param('id') userId: string) {
+    return this.usersService.deleteUserById(userId);
+  }
+
+  /**
+   * 📌 Suspend or unsuspend a user
+   */
+  @Patch('status/:id')
+  @ApiOperation({ summary: 'Suspend or unsuspend a user' })
+  @ApiParam({ name: 'id', required: true, example: '65d1fbb8397a4b1b3d4e9f6a', description: 'User ID' })
+  @ApiQuery({ name: 'status', required: true, example: false, description: 'Set true to suspend, false to unsuspend' })
+  async updateUserStatus(@Param('id') userId: string, @Query('status') status: string) {
+    return this.usersService.updateUserStatus(userId, status === 'true');
+  }
+
+  /**
+   * 📌 Get each user's login count
+   */
+  @Get('login-counts')
+  @ApiOperation({ summary: 'Get login counts for each user' })
+  async getUserLoginCounts() {
+    return this.usersService.getUserLoginCounts();
+  }
 }
