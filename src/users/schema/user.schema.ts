@@ -83,6 +83,9 @@ export class Users {
   @Prop()
   highestLevelOfEducation: string; // Updated field name
 
+  @Prop()
+  Carreer_Dream: string;
+
   @ApiProperty()
   @Prop()
   fieldOfStudy: string[]; // Single text input for major

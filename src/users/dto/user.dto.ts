@@ -465,6 +465,14 @@ export class UpdateUserDto {
   @IsString({ each: true })
   Skill_developement_strategies?: string[];
 
+  @ApiPropertyOptional({
+    example: 'Yes',
+    description: 'Work or internship experience',
+  })
+  @IsOptional()
+  @IsString()
+  Carreer_Dream?: string;
+
   // Work Experience
   @ApiPropertyOptional({
     example: 'Yes',

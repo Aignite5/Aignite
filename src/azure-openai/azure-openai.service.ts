@@ -50,14 +50,12 @@ export class AzureOpenaiService {
 The blueprint should be motivating, realistic, and structured for actionable growth.
 
 **User Profile:**
-- **Current Job Title:** ${user.data.currentJobTitle || 'Not specified'}
+-USER HAVE A CARRER DREAM OR ASPIRATION TO BE A ${user.data.Carreer_Dream || 'Not specified'}
 - **Fields of Study:** ${user.data.fieldOfStudy?.join(', ') || 'Not specified'}
-- **Future Aspirations:** ${user.data.futureAspirations || 'Not specified'}
 - **Highest Education:** ${user.data.highestLevelOfEducation || 'Not specified'}
 - **Industries of Interest:** ${user.data.industriesOfInterest?.join(', ') || 'Not specified'}
 - **Technical Skills:** ${user.data.technicalSkills?.join(', ') || 'Not specified'}
 - **Soft Skills:** ${user.data.softSkills?.join(', ') || 'Not specified'}
-- **University/Institution:** ${user.data.universityOrInstitution || 'Not specified'}
 - **Work Experience:** ${user.data.workExperience || 'Not specified'}
 - **Exciting Work:** ${user.data.excitingWork || 'Not specified'}
 - **Preferred Work Environments:** ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
@@ -122,6 +120,24 @@ Ensure the response is structured, actionable, and motivational, guiding the use
       data: this.formatCareerBlueprint(aiResponse),
     };
   }
+
+
+//   -USER HAVE A CARRER DREAM OR ASPIRATION TO BE A ${user.data.Carreer_Dream || 'Not specified'}
+// - **Current Job Title:** ${user.data.currentJobTitle || 'Not specified'}
+// - **Fields of Study:** ${user.data.fieldOfStudy?.join(', ') || 'Not specified'}
+// - **Future Aspirations:** ${user.data.futureAspirations || 'Not specified'}
+// - **Highest Education:** ${user.data.highestLevelOfEducation || 'Not specified'}
+// - **Industries of Interest:** ${user.data.industriesOfInterest?.join(', ') || 'Not specified'}
+// - **Technical Skills:** ${user.data.technicalSkills?.join(', ') || 'Not specified'}
+// - **Soft Skills:** ${user.data.softSkills?.join(', ') || 'Not specified'}
+// - **University/Institution:** ${user.data.universityOrInstitution || 'Not specified'}
+// - **Work Experience:** ${user.data.workExperience || 'Not specified'}
+// - **Exciting Work:** ${user.data.excitingWork || 'Not specified'}
+// - **Preferred Work Environments:** ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
+// - **Learning Preferences:** ${user.data.learningPreferences?.join(', ') || 'Not specified'}
+// - **Career Goals:** ${user.data.Career_goals?.join(', ') || 'Not specified'}
+// - **Skill Developement Strategies:** ${user.data.Skill_developement_strategies?.join(', ') || 'Not specified'}
+// - **Career Challenges:** ${user.data.careerChallenges?.join(', ') || 'Not specified'}
 
   //   async generateCareerBlueprint(userId: string) {
   //     const user = await this.UserSrv.findUserById(userId);
