@@ -62,6 +62,8 @@ The blueprint should be motivating, realistic, and structured for actionable gro
 - **Exciting Work:** ${user.data.excitingWork || 'Not specified'}
 - **Preferred Work Environments:** ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
 - **Learning Preferences:** ${user.data.learningPreferences?.join(', ') || 'Not specified'}
+- **Career Goals:** ${user.data.Career_goals?.join(', ') || 'Not specified'}
+- **Skill Developement Strategies:** ${user.data.Skill_developement_strategies?.join(', ') || 'Not specified'}
 - **Career Challenges:** ${user.data.careerChallenges?.join(', ') || 'Not specified'}
 
 **Career Blueprint Structure:**

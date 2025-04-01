@@ -447,6 +447,24 @@ export class UpdateUserDto {
   @IsString()
   careerExperience?: string;
 
+  @ApiPropertyOptional({
+    example: ['JavaScript', 'Python'],
+    description: 'User skills',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  Career_goals?: string[];
+
+  @ApiPropertyOptional({
+    example: ['JavaScript', 'Python'],
+    description: 'User skills',
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  Skill_developement_strategies?: string[];
+
   // Work Experience
   @ApiPropertyOptional({
     example: 'Yes',
@@ -546,6 +564,9 @@ export class UpdateUserDto {
   @IsArray()
   @IsString({ each: true })
   skills?: string[];
+
+
+
 }
 
 export class CreateUserDto {}

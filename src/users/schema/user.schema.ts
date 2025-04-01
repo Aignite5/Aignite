@@ -94,6 +94,15 @@ export class Users {
   @Prop({ type: [String] })
   skills: string[];
 
+  @Prop()
+  careerExperience: string; // Text input for career-related details
+
+  @Prop({ type: [String] })
+  Career_goals: string[];
+
+  @Prop({ type: [String] })
+  Skill_developement_strategies: string[];
+
   @ApiProperty()
   @Prop()
   universityOrInstitution: string;
@@ -119,8 +128,7 @@ export class Users {
   @Prop()
   currentJobTitle: string;
 
-  @Prop()
-  careerExperience: string; // Text input for career-related details
+
 
   // Work Experience
   @ApiProperty()
