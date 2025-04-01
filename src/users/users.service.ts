@@ -524,11 +524,20 @@ export class UsersService {
       }
 
       if (
+        payload.Carreer_Dream &&
+        payload.Carreer_Dream !== record.Carreer_Dream
+      ) {
+        record.Carreer_Dream = payload.Carreer_Dream;
+      }
+
+
+      if (
         payload.Career_goals &&
         payload.Career_goals !== record.Career_goals
       ) {
         record.Career_goals = payload.Career_goals;
       }
+
 
       if (
         payload. Skill_developement_strategies &&
