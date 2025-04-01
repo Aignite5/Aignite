@@ -523,6 +523,21 @@ export class UsersService {
         record.careerExperience = payload.careerExperience;
       }
 
+      if (
+        payload.Career_goals &&
+        payload.Career_goals !== record.Career_goals
+      ) {
+        record.Career_goals = payload.Career_goals;
+      }
+
+      if (
+        payload. Skill_developement_strategies &&
+        payload. Skill_developement_strategies !== record. Skill_developement_strategies
+      ) {
+        record. Skill_developement_strategies = payload. Skill_developement_strategies;
+      }
+
+
       // Hobbies & Skills
       if (
         payload.hobbies &&
