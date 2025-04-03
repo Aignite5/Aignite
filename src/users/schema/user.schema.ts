@@ -140,6 +140,10 @@ export class Users {
 
   @ApiProperty()
   @Prop()
+  ageRange: string; // Yes/No field
+
+  @ApiProperty()
+  @Prop()
   excitingWork: string; // What type of work excites the user
 
   // Skills
