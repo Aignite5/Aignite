@@ -8,6 +8,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AzureOpenaiModule } from './azure-openai/azure-openai.module';
+import { ImpressionModule } from './impression/impression.module';
 
 
 
@@ -21,6 +22,7 @@ import { AzureOpenaiModule } from './azure-openai/azure-openai.module';
     AuthModule,
     UsersModule,
     AzureOpenaiModule,
+    ImpressionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
