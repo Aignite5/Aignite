@@ -420,6 +420,16 @@ export class UsersService {
     }
   }
 
+  async getUserBlueprintById(userId: string) {
+    const user = await this.UsersModel.findById(userId).select('careerBlueprint').exec();
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    return { success: true, userId, careerBlueprint: user.careerBlueprint };
+  }
+
   async updateUser(
     userId: string,
     payload: UpdateUserDto,
@@ -626,6 +636,13 @@ export class UsersService {
         payload.excitingWork !== record.excitingWork
       ) {
         record.excitingWork = payload.excitingWork;
+      }
+
+      if (
+        payload.ageRange &&
+        payload.ageRange !== record.ageRange
+      ) {
+        record.ageRange = payload.ageRange;
       }
 
       // Skills

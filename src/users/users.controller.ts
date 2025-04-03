@@ -81,6 +81,14 @@ export class UsersController {
     }
   }
 
+
+  @Get(':id/blueprint/get-blueprint')
+  @ApiOperation({ summary: 'Get user by ID and return only the careerBlueprint field' })
+  @ApiParam({ name: 'id', required: true, example: '65f2c4a8b4d2e613e8a4f1b9', description: 'User ID' })
+  async getUserBlueprintById(@Param('id') userId: string) {
+    return this.usersService.getUserBlueprintById(userId);
+  }
+
   @ApiOperation({ summary: 'Update a user' })
   @Patch('/user/:userId')
   @ApiParam({ name: 'userId', description: 'ID of the user to update' })
