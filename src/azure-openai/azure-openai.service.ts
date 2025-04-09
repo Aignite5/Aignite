@@ -17,7 +17,7 @@ export class AzureOpenaiService {
 
   constructor(
     @Inject(forwardRef(() => UsersService)) readonly UserSrv: UsersService,
-     @InjectModel(Users.name) private readonly UsersModel: Model<Users>,
+    @InjectModel(Users.name) private readonly UsersModel: Model<Users>,
   ) {
     this.client = new AzureOpenAI({
       endpoint: process.env.AZURE_OPENAI_ENDPOINT,
@@ -40,68 +40,141 @@ export class AzureOpenaiService {
     return response.choices[0].message.content;
   }
 
+  //     const prompt = `Generate a personalized 5-year career blueprint for the user based on the following details.
+  // The blueprint should be motivating, realistic, and structured for actionable growth.
+
+  // **User Profile:**
+  // -USER HAVE A CARRER DREAM OR ASPIRATION TO BE A ${user.data.Carreer_Dream || 'Not specified'}
+  // - **Fields of Study:** ${user.data.fieldOfStudy?.join(', ') || 'Not specified'}
+  // - **Highest Education:** ${user.data.highestLevelOfEducation || 'Not specified'}
+  // - **Age range:** ${user.data.ageRange || 'Not specified'}
+  // - **Industries of Interest:** ${user.data.industriesOfInterest?.join(', ') || 'Not specified'}
+  // - **Technical Skills:** ${user.data.technicalSkills?.join(', ') || 'Not specified'}
+  // - **Soft Skills:** ${user.data.softSkills?.join(', ') || 'Not specified'}
+  // - **Work Or Internship Experience:** ${user.data.workExperience || 'Not specified'}
+  // - **Preferred Work Environments:** ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
+  // - **Learning Preferences:** ${user.data.learningPreferences?.join(', ') || 'Not specified'}
+  // - **Career Goals:** ${user.data.Career_goals?.join(', ') || 'Not specified'}
+  // - **Skill Developement Strategies:** ${user.data.Skill_developement_strategies?.join(', ') || 'Not specified'}
+  // - **Challenges to Career Goals:** ${user.data.careerChallenges?.join(', ') || 'Not specified'}
+
+  // **Career Blueprint Structure:**
+  // 1. **A Picture of the Future (5-Year Vision):**
+  //    - Describe where the user could be in five years if they follow this career blueprint.
+  //    - Include potential job titles, industries, skills mastered, estimated income range, and notable career achievements.
+  //    - Highlight lifestyle aspects such as professional networks, leadership roles, and personal growth.
+
+  // 2. **Current Position & Gap Analysis:**
+  //    - Summarize the user's current skills, education, experience, and interests.
+  //    - Clearly outline the key gaps they need to address to reach their 5-year vision.
+
+  // 3. **Learning & Skill Development Path:**
+  //    - Recommend specific courses, certifications, and real-world projects.
+  //    - Cover both technical and soft skills required for career progression.
+
+  // 4. **Mentorship & Networking Plan:**
+  //    - Suggest potential mentors and professional communities to engage with.
+  //    - Recommend industry events and strategies to build a strong professional network.
+
+  // 5. **Career Milestones & Opportunities:**
+  //    - Outline key career milestones to achieve at short-term (1 year), mid-term (3 years), and long-term (5 years).
+  //    - Suggest internships, projects, or job roles to pursue at each phase.
+
+  // 6. **Progress Tracking & Refinement:**
+  //    - Provide a structured plan for tracking progress, adjusting the roadmap based on achievements, and staying aligned with evolving industry trends.
+
+  // Ensure the response is structured, actionable, and motivational, guiding the user step by step in their career journey.`;
+
   async generateCareerBlueprint(userId: string) {
     const user = await this.UserSrv.findUserById(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
-    const prompt = `Generate a personalized 5-year career blueprint for the user based on the following details. 
-The blueprint should be motivating, realistic, and structured for actionable growth.
-
-**User Profile:**
--USER HAVE A CARRER DREAM OR ASPIRATION TO BE A ${user.data.Carreer_Dream || 'Not specified'}
-- **Fields of Study:** ${user.data.fieldOfStudy?.join(', ') || 'Not specified'}
-- **Highest Education:** ${user.data.highestLevelOfEducation || 'Not specified'}
-- **Age range:** ${user.data.ageRange || 'Not specified'}
-- **Industries of Interest:** ${user.data.industriesOfInterest?.join(', ') || 'Not specified'}
-- **Technical Skills:** ${user.data.technicalSkills?.join(', ') || 'Not specified'}
-- **Soft Skills:** ${user.data.softSkills?.join(', ') || 'Not specified'}
-- **Work Or Internship Experience:** ${user.data.workExperience || 'Not specified'}
-- **Preferred Work Environments:** ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
-- **Learning Preferences:** ${user.data.learningPreferences?.join(', ') || 'Not specified'}
-- **Career Goals:** ${user.data.Career_goals?.join(', ') || 'Not specified'}
-- **Skill Developement Strategies:** ${user.data.Skill_developement_strategies?.join(', ') || 'Not specified'}
-- **Challenges to Career Goals:** ${user.data.careerChallenges?.join(', ') || 'Not specified'}
-
-**Career Blueprint Structure:**
-1. **A Picture of the Future (5-Year Vision):**
-   - Describe where the user could be in five years if they follow this career blueprint.
-   - Include potential job titles, industries, skills mastered, estimated income range, and notable career achievements.
-   - Highlight lifestyle aspects such as professional networks, leadership roles, and personal growth.
-
-2. **Current Position & Gap Analysis:**
-   - Summarize the user's current skills, education, experience, and interests.
-   - Clearly outline the key gaps they need to address to reach their 5-year vision.
-
-3. **Learning & Skill Development Path:**
-   - Recommend specific courses, certifications, and real-world projects.
-   - Cover both technical and soft skills required for career progression.
-
-4. **Mentorship & Networking Plan:**
-   - Suggest potential mentors and professional communities to engage with.
-   - Recommend industry events and strategies to build a strong professional network.
-
-5. **Career Milestones & Opportunities:**
-   - Outline key career milestones to achieve at short-term (1 year), mid-term (3 years), and long-term (5 years).
-   - Suggest internships, projects, or job roles to pursue at each phase.
-
-6. **Progress Tracking & Refinement:**
-   - Provide a structured plan for tracking progress, adjusting the roadmap based on achievements, and staying aligned with evolving industry trends.
-
-Ensure the response is structured, actionable, and motivational, guiding the user step by step in their career journey.`;
-
+  
+    const prompt = `You are a career coach AI assistant.
+  
+  Generate a **personalized 5-year career blueprint** for the user based on the profile below. The blueprint must have two sections:
+  
+  ---
+  
+  ### 📘 Section 1: Motivational Career Blueprint (Readable Text)
+  
+  Provide a motivating, realistic, and structured 5-year career blueprint for the user.
+  
+  Cover the following:
+  - **5-Year Vision**
+  - **Current Position & Gap Analysis**
+  - **Learning & Skill Development Plan**
+  - **Mentorship & Networking Strategy**
+  - **Career Milestones (1yr, 3yrs, 5yrs)**
+  - **Progress Tracking Strategy**
+  
+  ---
+  
+  ### 📦 Section 2: Structured JSON Format
+  
+  After the narrative, include a valid JSON object with the following structure:
+  
+  \`\`\`json
+  {
+    "vision": string,
+    "gapAnalysis": string,
+    "learningPath": {
+      "technicalSkills": string[],
+      "softSkills": string[],
+      "recommendedCourses": string[],
+      "realWorldProjects": string[]
+    },
+    "mentorshipAndNetworking": {
+      "mentorshipPlan": string,
+      "recommendedCommunities": string[],
+      "industryEvents": string[]
+    },
+    "milestones": {
+      "year1": string[],
+      "year3": string[],
+      "year5": string[]
+    },
+    "progressTracking": string,
+    "tasks": string[],
+    "projects": string[]
+  }
+  \`\`\`
+  
+  Do not explain the JSON — just append it clearly and return a valid object.
+  
+  ---
+  
+  Use the following **User Profile**:
+  
+  - Career Dream: ${user.data.Carreer_Dream || 'Not specified'}
+  - Fields of Study: ${user.data.fieldOfStudy?.join(', ') || 'Not specified'}
+  - Highest Education: ${user.data.highestLevelOfEducation || 'Not specified'}
+  - Age range: ${user.data.ageRange || 'Not specified'}
+  - Industries of Interest: ${user.data.industriesOfInterest?.join(', ') || 'Not specified'}
+  - Technical Skills: ${user.data.technicalSkills?.join(', ') || 'Not specified'}
+  - Soft Skills: ${user.data.softSkills?.join(', ') || 'Not specified'}
+  - Work Experience: ${user.data.workExperience || 'Not specified'}
+  - Preferred Work Environments: ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
+  - Learning Preferences: ${user.data.learningPreferences?.join(', ') || 'Not specified'}
+  - Career Goals: ${user.data.Career_goals?.join(', ') || 'Not specified'}
+  - Skill Development Strategies: ${user.data.Skill_developement_strategies?.join(', ') || 'Not specified'}
+  - Career Challenges: ${user.data.careerChallenges?.join(', ') || 'Not specified'}
+  
+  Ensure the text is inspiring and the JSON is clean and complete.
+  `;
+  
     const response = await this.client.chat.completions.create({
       messages: [
         { role: 'system', content: 'You are a career coach AI assistant.' },
         { role: 'user', content: prompt },
       ],
       model: 'gpt-4o',
-      max_tokens: 1000,
+      max_tokens: 2000,
     });
-
-    const aiResponse = response.choices[0]?.message?.content.trim();
-
+  
+    const aiResponse = response.choices[0]?.message?.content?.trim();
+  
     if (!aiResponse) {
       return {
         success: false,
@@ -109,35 +182,61 @@ Ensure the response is structured, actionable, and motivational, guiding the use
         message: 'AI did not return a response. Please try again.',
       };
     }
+  
     const record = await this.UsersModel.findOne({ _id: userId });
     record.careerBlueprint = aiResponse;
     await record.save();
-
+  
+    const formatted = this.formatCareerBlueprint(aiResponse);
+  
     return {
       success: true,
       code: 200,
       message: 'Career blueprint generated successfully',
-      data: this.formatCareerBlueprint(aiResponse),
+      data: aiResponse,
     };
   }
 
 
-//   -USER HAVE A CARRER DREAM OR ASPIRATION TO BE A ${user.data.Carreer_Dream || 'Not specified'}
-// - **Current Job Title:** ${user.data.currentJobTitle || 'Not specified'}
-// - **Fields of Study:** ${user.data.fieldOfStudy?.join(', ') || 'Not specified'}
-// - **Future Aspirations:** ${user.data.futureAspirations || 'Not specified'}
-// - **Highest Education:** ${user.data.highestLevelOfEducation || 'Not specified'}
-// - **Industries of Interest:** ${user.data.industriesOfInterest?.join(', ') || 'Not specified'}
-// - **Technical Skills:** ${user.data.technicalSkills?.join(', ') || 'Not specified'}
-// - **Soft Skills:** ${user.data.softSkills?.join(', ') || 'Not specified'}
-// - **University/Institution:** ${user.data.universityOrInstitution || 'Not specified'}
-// - **Work Experience:** ${user.data.workExperience || 'Not specified'}
-// - **Exciting Work:** ${user.data.excitingWork || 'Not specified'}
-// - **Preferred Work Environments:** ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
-// - **Learning Preferences:** ${user.data.learningPreferences?.join(', ') || 'Not specified'}
-// - **Career Goals:** ${user.data.Career_goals?.join(', ') || 'Not specified'}
-// - **Skill Developement Strategies:** ${user.data.Skill_developement_strategies?.join(', ') || 'Not specified'}
-// - **Career Challenges:** ${user.data.careerChallenges?.join(', ') || 'Not specified'}
+
+  formatCareerBlueprint(content: string) {
+    const extractSection = (label: string) => {
+      const regex = new RegExp(`\\*\\*${label}\\*\\*\\s*:?\\s*([\\s\\S]*?)(?=\\n\\*\\*|\\n###|\\n---|$)`);
+      const match = content.match(regex);
+      return match ? match[1].trim() : '';
+    };
+  
+    const extractJson = () => {
+      const jsonMatch = content.match(/```json([\s\S]*?)```/);
+      try {
+        return jsonMatch ? JSON.parse(jsonMatch[1].trim()) : null;
+      } catch (e) {
+        return null;
+      }
+    };
+  
+    return {
+      structuredJson: extractJson()
+    };
+  }
+  
+
+  //   -USER HAVE A CARRER DREAM OR ASPIRATION TO BE A ${user.data.Carreer_Dream || 'Not specified'}
+  // - **Current Job Title:** ${user.data.currentJobTitle || 'Not specified'}
+  // - **Fields of Study:** ${user.data.fieldOfStudy?.join(', ') || 'Not specified'}
+  // - **Future Aspirations:** ${user.data.futureAspirations || 'Not specified'}
+  // - **Highest Education:** ${user.data.highestLevelOfEducation || 'Not specified'}
+  // - **Industries of Interest:** ${user.data.industriesOfInterest?.join(', ') || 'Not specified'}
+  // - **Technical Skills:** ${user.data.technicalSkills?.join(', ') || 'Not specified'}
+  // - **Soft Skills:** ${user.data.softSkills?.join(', ') || 'Not specified'}
+  // - **University/Institution:** ${user.data.universityOrInstitution || 'Not specified'}
+  // - **Work Experience:** ${user.data.workExperience || 'Not specified'}
+  // - **Exciting Work:** ${user.data.excitingWork || 'Not specified'}
+  // - **Preferred Work Environments:** ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
+  // - **Learning Preferences:** ${user.data.learningPreferences?.join(', ') || 'Not specified'}
+  // - **Career Goals:** ${user.data.Career_goals?.join(', ') || 'Not specified'}
+  // - **Skill Developement Strategies:** ${user.data.Skill_developement_strategies?.join(', ') || 'Not specified'}
+  // - **Career Challenges:** ${user.data.careerChallenges?.join(', ') || 'Not specified'}
 
   //   async generateCareerBlueprint(userId: string) {
   //     const user = await this.UserSrv.findUserById(userId);
@@ -192,19 +291,7 @@ Ensure the response is structured, actionable, and motivational, guiding the use
   /**
    * Formats AI response into a structured JSON format
    */
-  private formatCareerBlueprint(response: string) {
-    const sections = response
-      .split('\n\n')
-      .filter((section) => section.trim() !== '');
-    let formattedBlueprint: any = {};
 
-    sections.forEach((section) => {
-      const [title, ...content] = section.split('\n');
-      formattedBlueprint[title.trim()] = content.join('\n').trim();
-    });
-
-    return formattedBlueprint;
-  }
 
   async generateCareerBlueprintInHouse(userId: string) {
     const user = await this.UserSrv.findUserById(userId);

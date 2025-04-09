@@ -89,6 +89,13 @@ export class UsersController {
     return this.usersService.getUserBlueprintById(userId);
   }
 
+  @Get(':id/blueprint/get-blueprint/full-structure')
+  @ApiOperation({ summary: 'Get user by ID and return only the careerBlueprint field' })
+  @ApiParam({ name: 'id', required: true, example: '65f2c4a8b4d2e613e8a4f1b9', description: 'User ID' })
+  async getFormattedUserBlueprintById(@Param('id') userId: string) {
+    return this.usersService.getFormattedUserBlueprintById(userId);
+  }
+
   @ApiOperation({ summary: 'Update a user' })
   @Patch('/user/:userId')
   @ApiParam({ name: 'userId', description: 'ID of the user to update' })
@@ -103,7 +110,17 @@ export class UsersController {
     return this.usersService.updateUser(userId, updateUser);
   }
 
-
+  @Get('all-metors/mentors')
+  @ApiOperation({ summary: 'Get all users with role = Mentors' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async getAllMentors(
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
+    return this.usersService.getAllMentors(Number(page), Number(limit));
+  }
+  
 
   @Get("admin/allusers")
   @ApiOperation({ summary: 'Get all users with pagination' })
