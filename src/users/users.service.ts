@@ -430,6 +430,36 @@ export class UsersService {
     return { success: true, userId, careerBlueprint: user.careerBlueprint };
   }
 
+  async getFormattedUserBlueprintById(userId: string) {
+    const user = await this.UsersModel.findById(userId).select('careerBlueprint').exec();
+
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    const formatted = this.formatCareerBlueprint(user.careerBlueprint);
+    return { success: true, userId, careerBlueprint: formatted };
+  }
+  formatCareerBlueprint(content: string) {
+    const extractSection = (label: string) => {
+      const regex = new RegExp(`\\*\\*${label}\\*\\*\\s*:?\\s*([\\s\\S]*?)(?=\\n\\*\\*|\\n###|\\n---|$)`);
+      const match = content.match(regex);
+      return match ? match[1].trim() : '';
+    };
+  
+    const extractJson = () => {
+      const jsonMatch = content.match(/```json([\s\S]*?)```/);
+      try {
+        return jsonMatch ? JSON.parse(jsonMatch[1].trim()) : null;
+      } catch (e) {
+        return null;
+      }
+    };
+  
+    return {
+      structuredJson: extractJson()
+    };
+  }
+
   async updateUser(
     userId: string,
     payload: UpdateUserDto,
@@ -847,6 +877,26 @@ export class UsersService {
       users,
     };
   }
+
+  async getAllMentors(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+  
+    const mentors = await this.UsersModel.find({ role: 'Mentor' })
+      .skip(skip)
+      .limit(limit)
+      .exec();
+  
+    const totalMentors = await this.UsersModel.countDocuments({ role: 'Mentor' });
+  
+    return {
+      success: true,
+      totalMentors,
+      totalPages: Math.ceil(totalMentors / limit),
+      currentPage: page,
+      mentors,
+    };
+  }
+  
 
   async getAllUsersSearch(
     page: number = 1,
