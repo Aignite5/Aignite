@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { CreateMentorDto, CreateUserDto, UpdateUserDto } from './dto/user.dto';
 import { ApiConsumes, ApiNotFoundResponse, ApiOperation, ApiParam, ApiProduces, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdatePasswordDTO } from 'src/utils/utils.types';
 import { OTPUserDTO } from 'src/auth/dto/auth.dto';
@@ -108,6 +108,14 @@ export class UsersController {
     @Body() updateUser: UpdateUserDto,
   ): Promise<any> {
     return this.usersService.updateUser(userId, updateUser);
+  }
+
+  @Post('create-mentor/sample-mentor')
+  @ApiOperation({ summary: 'Create a new mentor profile' })
+  @ApiResponse({ status: 201, description: 'Mentor created successfully' })
+  @ApiResponse({ status: 409, description: 'Mentor with this email already exists' })
+  async createMentor(@Body() dto: CreateMentorDto) {
+    return this.usersService.createMentor(dto);
   }
 
   @Get('all-metors/mentors')

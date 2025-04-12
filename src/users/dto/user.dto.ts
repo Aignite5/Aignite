@@ -573,8 +573,37 @@ export class UpdateUserDto {
   @IsString({ each: true })
   skills?: string[];
 
-
-
 }
+
+export class CreateMentorDto {
+  @ApiProperty({
+    example: 'John',
+    description: 'First name of the mentor',
+  })
+  @IsNotEmpty()
+  firstName: string;
+
+  @ApiProperty({
+    example: 'Doe',
+    description: 'Last name of the mentor',
+  })
+  @IsNotEmpty()
+  lastName: string;
+
+  @ApiProperty({
+    example: 'john.doe@example.com',
+    description: 'Email address of the mentor',
+  })
+  @IsEmail()
+  email: string;
+
+  @ApiProperty({
+    example: 'Software Engineering',
+    description: 'Area of specialty or expertise',
+  })
+  @IsNotEmpty()
+  specialty: string;
+}
+
 
 export class CreateUserDto {}

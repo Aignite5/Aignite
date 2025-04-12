@@ -10,32 +10,42 @@ import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 export class ImpressionController {
   constructor(private readonly impressionService: ImpressionService) {}
 
-  @Post('log')
-  @ApiOperation({ summary: 'Log an impression when a user views a profile, ad, or feature' })
-  async logImpression(@Body() logImpressionDto: LogImpressionDto) {
-    return this.impressionService.logImpression(logImpressionDto);
-  }
+  // @Get()
+  // getTest() {
+  //   this.impressionService.logEvent('TestEndpointCalled', {
+  //     feature: 'bluePrint-route',
+  //     userId: '123',
+  //   });
 
-  /**
-   * 📌 Get the total number of impressions for a user.
-   */
-  @Get(':userId/total')
-  @ApiOperation({ summary: 'Get total impressions for a user' })
-  @ApiParam({ name: 'userId', required: true, example: '65f2c4a8b4d2e613e8a4f1b9' })
-  async getUserImpressions(@Param('userId') userId: string) {
-    return this.impressionService.getUserImpressions(userId);
-  }
+  //   return { message: 'Logged to Application Insights!' };
+  // }
 
-  @Get(':userId/daily')
-  @ApiOperation({ summary: 'Get daily impressions for the past 30 days' })
-  @ApiParam({ name: 'userId', required: true, example: '65f2c4a8b4d2e613e8a4f1b9' })
-  async getDailyImpressions(@Param('userId') userId: string) {
-    return this.impressionService.getDailyImpressions(userId);
-  }
+  // @Post('log')
+  // @ApiOperation({ summary: 'Log an impression when a user views a profile, ad, or feature' })
+  // async logImpression(@Body() logImpressionDto: LogImpressionDto) {
+  //   return this.impressionService.logImpression(logImpressionDto);
+  // }
 
-  @Get('daily')
-  @ApiOperation({ summary: 'Get general daily impressions for the past 30 days' })
-  async getGeneralDailyImpressions() {
-    return this.impressionService.getGeneralDailyImpressions();
-  }
+  // /**
+  //  * 📌 Get the total number of impressions for a user.
+  //  */
+  // @Get(':userId/total')
+  // @ApiOperation({ summary: 'Get total impressions for a user' })
+  // @ApiParam({ name: 'userId', required: true, example: '65f2c4a8b4d2e613e8a4f1b9' })
+  // async getUserImpressions(@Param('userId') userId: string) {
+  //   return this.impressionService.getUserImpressions(userId);
+  // }
+
+  // @Get(':userId/daily')
+  // @ApiOperation({ summary: 'Get daily impressions for the past 30 days' })
+  // @ApiParam({ name: 'userId', required: true, example: '65f2c4a8b4d2e613e8a4f1b9' })
+  // async getDailyImpressions(@Param('userId') userId: string) {
+  //   return this.impressionService.getDailyImpressions(userId);
+  // }
+
+  // @Get('daily')
+  // @ApiOperation({ summary: 'Get general daily impressions for the past 30 days' })
+  // async getGeneralDailyImpressions() {
+  //   return this.impressionService.getGeneralDailyImpressions();
+  // }
 }

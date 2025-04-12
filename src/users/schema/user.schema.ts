@@ -23,6 +23,9 @@ export class Users {
   email: string;
 
   @Prop()
+  specialty:string;
+
+  @Prop()
   date_of_birth: Date;
 
   @Prop()

@@ -11,6 +11,7 @@ import {
 } from '@nestjs/common';
 import {
   CreateAccountDto,
+  CreateMentorDto,
   CreateUserDto,
   UpdateUserDto,
   UserDto,
@@ -421,7 +422,9 @@ export class UsersService {
   }
 
   async getUserBlueprintById(userId: string) {
-    const user = await this.UsersModel.findById(userId).select('careerBlueprint').exec();
+    const user = await this.UsersModel.findById(userId)
+      .select('careerBlueprint')
+      .exec();
 
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
@@ -431,7 +434,9 @@ export class UsersService {
   }
 
   async getFormattedUserBlueprintById(userId: string) {
-    const user = await this.UsersModel.findById(userId).select('careerBlueprint').exec();
+    const user = await this.UsersModel.findById(userId)
+      .select('careerBlueprint')
+      .exec();
 
     if (!user) {
       throw new NotFoundException(`User with ID ${userId} not found`);
@@ -441,11 +446,13 @@ export class UsersService {
   }
   formatCareerBlueprint(content: string) {
     const extractSection = (label: string) => {
-      const regex = new RegExp(`\\*\\*${label}\\*\\*\\s*:?\\s*([\\s\\S]*?)(?=\\n\\*\\*|\\n###|\\n---|$)`);
+      const regex = new RegExp(
+        `\\*\\*${label}\\*\\*\\s*:?\\s*([\\s\\S]*?)(?=\\n\\*\\*|\\n###|\\n---|$)`,
+      );
       const match = content.match(regex);
       return match ? match[1].trim() : '';
     };
-  
+
     const extractJson = () => {
       const jsonMatch = content.match(/```json([\s\S]*?)```/);
       try {
@@ -454,9 +461,9 @@ export class UsersService {
         return null;
       }
     };
-  
+
     return {
-      structuredJson: extractJson()
+      structuredJson: extractJson(),
     };
   }
 
@@ -570,7 +577,6 @@ export class UsersService {
         record.Carreer_Dream = payload.Carreer_Dream;
       }
 
-
       if (
         payload.Career_goals &&
         payload.Career_goals !== record.Career_goals
@@ -578,14 +584,14 @@ export class UsersService {
         record.Career_goals = payload.Career_goals;
       }
 
-
       if (
-        payload. Skill_developement_strategies &&
-        payload. Skill_developement_strategies !== record. Skill_developement_strategies
+        payload.Skill_developement_strategies &&
+        payload.Skill_developement_strategies !==
+          record.Skill_developement_strategies
       ) {
-        record. Skill_developement_strategies = payload. Skill_developement_strategies;
+        record.Skill_developement_strategies =
+          payload.Skill_developement_strategies;
       }
-
 
       // Hobbies & Skills
       if (
@@ -668,10 +674,7 @@ export class UsersService {
         record.excitingWork = payload.excitingWork;
       }
 
-      if (
-        payload.ageRange &&
-        payload.ageRange !== record.ageRange
-      ) {
+      if (payload.ageRange && payload.ageRange !== record.ageRange) {
         record.ageRange = payload.ageRange;
       }
 
@@ -878,16 +881,36 @@ export class UsersService {
     };
   }
 
+  async createMentor(dto: CreateMentorDto) {
+    const existing = await this.UsersModel.findOne({ email: dto.email });
+
+    if (existing) {
+      throw new ConflictException('Mentor with this email already exists.');
+    }
+
+    const mentor = new this.UsersModel({ ...dto, role: 'Mentor' });
+    await mentor.save();
+
+    return {
+      success: true,
+      message: 'Mentor created successfully',
+      data: mentor,
+    };
+  }
+
   async getAllMentors(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
-  
+
     const mentors = await this.UsersModel.find({ role: 'Mentor' })
+      .select('firstName lastName email specialty profileImageUrl')
       .skip(skip)
       .limit(limit)
       .exec();
-  
-    const totalMentors = await this.UsersModel.countDocuments({ role: 'Mentor' });
-  
+
+    const totalMentors = await this.UsersModel.countDocuments({
+      role: 'Mentor',
+    });
+
     return {
       success: true,
       totalMentors,
@@ -896,7 +919,6 @@ export class UsersService {
       mentors,
     };
   }
-  
 
   async getAllUsersSearch(
     page: number = 1,
@@ -917,7 +939,10 @@ export class UsersService {
     }
 
     // Fetch users
-    const users = await this.UsersModel.find(query).skip(skip).limit(limit).exec();
+    const users = await this.UsersModel.find(query)
+      .skip(skip)
+      .limit(limit)
+      .exec();
 
     // Count total users that match the search (for pagination)
     const total = await this.UsersModel.countDocuments(query).exec();
@@ -931,11 +956,10 @@ export class UsersService {
     };
   }
 
-
   async countRegisteredUsersPerDay(startDate: string, endDate: string) {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    
+
     const results = await this.UsersModel.aggregate([
       {
         $match: {
@@ -944,7 +968,7 @@ export class UsersService {
       },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdDate" } },
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdDate' } },
           count: { $sum: 1 },
         },
       },
@@ -956,7 +980,6 @@ export class UsersService {
       data: results,
     };
   }
-
 
   async getWeeklyUserGrowth() {
     const today = new Date();
@@ -997,17 +1020,18 @@ export class UsersService {
     };
   }
 
-
-  async getUsersWithIncompleteAcademicBackground(page: number = 1, limit: number = 10) {
+  async getUsersWithIncompleteAcademicBackground(
+    page: number = 1,
+    limit: number = 10,
+  ) {
     const skip = (page - 1) * limit;
-    const users = await this.UsersModel
-      .find({
-        $or: [
-          { highestLevelOfEducation: { $exists: false, $eq: null } },
-          { fieldOfStudy: { $exists: false, $size: 0 } },
-          { universityOrInstitution: { $exists: false, $eq: null } },
-        ],
-      })
+    const users = await this.UsersModel.find({
+      $or: [
+        { highestLevelOfEducation: { $exists: false, $eq: null } },
+        { fieldOfStudy: { $exists: false, $size: 0 } },
+        { universityOrInstitution: { $exists: false, $eq: null } },
+      ],
+    })
       .skip(skip)
       .limit(limit)
       .exec();
@@ -1029,7 +1053,6 @@ export class UsersService {
     };
   }
 
-
   async deleteUserById(userId: string) {
     const user = await this.UsersModel.findByIdAndDelete(userId).exec();
     if (!user) throw new NotFoundException('User not found');
@@ -1040,11 +1063,17 @@ export class UsersService {
    * 📌 Suspend or unsuspend a user
    */
   async updateUserStatus(userId: string, status: boolean) {
-    const user = await this.UsersModel.findByIdAndUpdate(userId, { status }, { new: true }).exec();
+    const user = await this.UsersModel.findByIdAndUpdate(
+      userId,
+      { status },
+      { new: true },
+    ).exec();
     if (!user) throw new NotFoundException('User not found');
     return {
       success: true,
-      message: status ? 'User suspended successfully' : 'User unsuspended successfully',
+      message: status
+        ? 'User suspended successfully'
+        : 'User unsuspended successfully',
       data: user,
     };
   }
@@ -1053,7 +1082,10 @@ export class UsersService {
    * 📌 Get each user's login count
    */
   async getUserLoginCounts() {
-    const users = await this.UsersModel.find({}, { firstName: 1, lastName: 1, email: 1, sign_in_counts: 1 }).exec();
+    const users = await this.UsersModel.find(
+      {},
+      { firstName: 1, lastName: 1, email: 1, sign_in_counts: 1 },
+    ).exec();
     return { success: true, total: users.length, data: users };
   }
 }

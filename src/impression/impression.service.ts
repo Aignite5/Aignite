@@ -5,12 +5,45 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Impressions } from './schemas/impression.schema';
 import { Model } from 'mongoose';
 import * as moment from 'moment';
+import * as appInsights from 'applicationinsights';
 
 @Injectable()
 export class ImpressionService {
+
   constructor(
     @InjectModel(Impressions.name) private impressionsModel: Model<Impressions>,
-  ) {}
+  ) {
+    // const connectionString = process.env.APPINSIGHTS_CONNECTION_STRING;
+
+    // if (connectionString && !appInsights.defaultClient) {
+    //   appInsights
+    //     .setup(connectionString)
+    //     .setAutoDependencyCorrelation(true)
+    //     .setAutoCollectRequests(true)
+    //     .setAutoCollectPerformance(true, true)
+    //     .setAutoCollectExceptions(true)
+    //     .setAutoCollectDependencies(true)
+    //     .setAutoCollectConsole(true)
+    //     .setUseDiskRetryCaching(true)
+    //     .start();
+    // }
+  }
+
+  // logEvent(name: string, properties?: { [key: string]: string }) {
+  //   appInsights.defaultClient?.trackEvent({ name, properties });
+  // }
+
+  // logException(exception: Error) {
+  //   appInsights.defaultClient?.trackException({ exception });
+  // }
+
+  // logMetric(name: string, value: number) {
+  //   appInsights.defaultClient?.trackMetric({ name, value });
+  // }
+
+  // logTrace(message: string, properties?: { [key: string]: string }) {
+  //   appInsights.defaultClient?.trackTrace({ message, properties });
+  // }
 
   /**
    * 📌 Log an impression when a user views a profile, ad, or feature.
