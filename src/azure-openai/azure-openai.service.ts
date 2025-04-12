@@ -194,6 +194,7 @@ export class AzureOpenaiService {
       code: 200,
       message: 'Career blueprint generated successfully',
       data: aiResponse,
+      formatted
     };
   }
 
