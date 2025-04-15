@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateMentorDto, CreateUserDto, UpdateUserDto } from './dto/user.dto';
+import { CreateMentorDto, CreateUserDto, UpdateProgressDto, UpdateUserDto } from './dto/user.dto';
 import { ApiConsumes, ApiNotFoundResponse, ApiOperation, ApiParam, ApiProduces, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdatePasswordDTO } from 'src/utils/utils.types';
 import { OTPUserDTO } from 'src/auth/dto/auth.dto';
@@ -81,7 +81,11 @@ export class UsersController {
     }
   }
 
-
+////////////////////////////////////////////BLUEPRINT////////////////////////////////
+////////////////////////////////////////////BLUEPRINT////////////////////////////////
+////////////////////////////////////////////BLUEPRINT////////////////////////////////
+////////////////////////////////////////////BLUEPRINT////////////////////////////////
+////////////////////////////////////////////BLUEPRINT////////////////////////////////
   @Get(':id/blueprint/get-blueprint')
   @ApiOperation({ summary: 'Get user by ID and return only the careerBlueprint field' })
   @ApiParam({ name: 'id', required: true, example: '65f2c4a8b4d2e613e8a4f1b9', description: 'User ID' })
@@ -96,6 +100,27 @@ export class UsersController {
     return this.usersService.getFormattedUserBlueprintById(userId);
   }
 
+  @Patch('blueprint/update/:userId/progress')
+  @ApiOperation({ summary: 'Update user career progress' })
+  @ApiResponse({ status: 200, description: 'Progress updated successfully' })
+  async updateProgress(
+    @Param('userId') userId: string,
+    @Body() dto: UpdateProgressDto,
+  ) {
+    return this.usersService.updateUserProgress(userId, dto);
+  }
+
+  @Get('blueprint/get/:userId/progress')
+  @ApiOperation({ summary: 'Get user progress (milestones, tasks, projects)' })
+  @ApiResponse({ status: 200, description: 'User progress retrieved' })
+  async getProgress(@Param('userId') userId: string) {
+    return this.usersService.getUserProgress(userId);
+  }
+////////////////////////////////////////////BLUEPRINT////////////////////////////////
+////////////////////////////////////////////BLUEPRINT////////////////////////////////
+////////////////////////////////////////////BLUEPRINT////////////////////////////////
+////////////////////////////////////////////BLUEPRINT////////////////////////////////
+////////////////////////////////////////////BLUEPRINT////////////////////////////////
   @ApiOperation({ summary: 'Update a user' })
   @Patch('/user/:userId')
   @ApiParam({ name: 'userId', description: 'ID of the user to update' })
