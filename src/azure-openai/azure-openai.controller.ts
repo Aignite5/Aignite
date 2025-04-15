@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { AzureOpenaiService } from './azure-openai.service';
-import { CreateAzureOpenaiDto } from './dto/create-azure-openai.dto';
+import { CreateAzureOpenaiDto } from './dto/azure-openai.dto';
 import { UpdateAzureOpenaiDto } from './dto/update-azure-openai.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
