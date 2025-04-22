@@ -91,19 +91,19 @@ export class AzureOpenaiService {
       throw new NotFoundException('User not found');
     }
   
-    const prompt = `You are a career coach AI assistant.
+    const prompt = `As an experience career coach
   
   Generate a **personalized 5-year career blueprint** for the user based on the profile below. The blueprint must have two sections:
   
   ---
   
-  ### 📘 Section 1: Motivational Career Blueprint (Readable Text)
+  ### 📘 Section 1: Motivational Career Blueprint 
   
   Provide a motivating, realistic, and structured 5-year career blueprint for the user.
   
   Cover the following:
-  - **5-Year Vision**
-  - **Current Position & Gap Analysis**
+  - **In the next 5 years; An inspiring picture of the user's career in 5 years**
+  - **Strengths & Gap Analysis**
   - **Learning & Skill Development Plan**
   - **Mentorship & Networking Strategy**
   - **Career Milestones (1yr, 3yrs, 5yrs)**
