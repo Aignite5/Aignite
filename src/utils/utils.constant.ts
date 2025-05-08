@@ -14,6 +14,8 @@ export enum AppRole {
   STUDENT = 'Student',
   EDUCATOR = 'Educator',
   MENTOR = 'Mentor',
+  PATNER = 'Partner',
+  TALENT = 'Talent',
 }
 
 export const DefaultPassportLink = {
