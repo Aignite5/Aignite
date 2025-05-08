@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { AzureOpenaiModule } from './azure-openai/azure-openai.module';
 import { ImpressionModule } from './impression/impression.module';
+import { SessionsModule } from './sessions/sessions.module';
 
 
 
@@ -23,6 +24,7 @@ import { ImpressionModule } from './impression/impression.module';
     UsersModule,
     AzureOpenaiModule,
     ImpressionModule,
+    SessionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
