@@ -572,7 +572,6 @@ export class UpdateUserDto {
   @IsArray()
   @IsString({ each: true })
   skills?: string[];
-
 }
 
 export class CreateMentorDto {
@@ -613,7 +612,17 @@ export class UpdateProgressDto {
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()
   @IsArray()
+  year2?: string[];
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @IsArray()
   year3?: string[];
+
+  @ApiPropertyOptional({ type: [String] })
+  @IsOptional()
+  @IsArray()
+  year4?: string[];
 
   @ApiPropertyOptional({ type: [String] })
   @IsOptional()

@@ -11,7 +11,13 @@ export class Progress extends Document {
   year1: string[];
 
   @Prop({ default: [] })
+  year2: string[];
+
+  @Prop({ default: [] })
   year3: string[];
+
+  @Prop({ default: [] })
+  year4: string[];
 
   @Prop({ default: [] })
   year5: string[];
