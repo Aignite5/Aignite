@@ -424,131 +424,147 @@ export class UsersService {
     }
   }
 
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-async getUserBlueprintById(userId: string) {
-  const user = await this.UsersModel.findById(userId)
-    .select('careerBlueprint')
-    .exec();
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  async getUserBlueprintById(userId: string) {
+    const user = await this.UsersModel.findById(userId)
+      .select('careerBlueprint')
+      .exec();
 
-  if (!user) {
-    throw new NotFoundException(`User with ID ${userId} not found`);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    return { success: true, userId, careerBlueprint: user.careerBlueprint };
   }
 
-  return { success: true, userId, careerBlueprint: user.careerBlueprint };
-}
+  async getFormattedUserBlueprintById(userId: string) {
+    const user = await this.UsersModel.findById(userId)
+      .select('careerBlueprint')
+      .exec();
 
-async getFormattedUserBlueprintById(userId: string) {
-  const user = await this.UsersModel.findById(userId)
-    .select('careerBlueprint')
-    .exec();
-
-  if (!user) {
-    throw new NotFoundException(`User with ID ${userId} not found`);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+    const formatted = this.formatCareerBlueprint(user.careerBlueprint);
+    return { success: true, userId, careerBlueprint: formatted };
   }
-  const formatted = this.formatCareerBlueprint(user.careerBlueprint);
-  return { success: true, userId, careerBlueprint: formatted };
-}
-formatCareerBlueprint(content: string) {
-  const extractSection = (label: string) => {
-    const regex = new RegExp(
-      `\\*\\*${label}\\*\\*\\s*:?\\s*([\\s\\S]*?)(?=\\n\\*\\*|\\n###|\\n---|$)`,
+  formatCareerBlueprint(content: string) {
+    const extractSection = (label: string) => {
+      const regex = new RegExp(
+        `\\*\\*${label}\\*\\*\\s*:?\\s*([\\s\\S]*?)(?=\\n\\*\\*|\\n###|\\n---|$)`,
+      );
+      const match = content.match(regex);
+      return match ? match[1].trim() : '';
+    };
+
+    const extractJson = () => {
+      const jsonMatch = content.match(/```json([\s\S]*?)```/);
+      try {
+        return jsonMatch ? JSON.parse(jsonMatch[1].trim()) : null;
+      } catch (e) {
+        return null;
+      }
+    };
+
+    return {
+      structuredJson: extractJson(),
+    };
+  }
+
+  async updateUserProgress(userId: string, dto: UpdateProgressDto) {
+    const user = await this.UsersModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    const progress = await this.progressModel.findOneAndUpdate(
+      { userId },
+      { $set: dto },
+      { new: true, upsert: true },
     );
-    const match = content.match(regex);
-    return match ? match[1].trim() : '';
-  };
 
-  const extractJson = () => {
-    const jsonMatch = content.match(/```json([\s\S]*?)```/);
+    return {
+      success: true,
+      message: 'Progress updated successfully',
+      data: progress,
+    };
+  }
+
+  extractStructuredJson(aiResponse: string) {
     try {
-      return jsonMatch ? JSON.parse(jsonMatch[1].trim()) : null;
-    } catch (e) {
-      return null;
+      const jsonMatch = aiResponse.match(/```json([\s\S]*?)```/);
+      if (jsonMatch && jsonMatch[1]) {
+        return JSON.parse(jsonMatch[1].trim());
+      }
+    } catch (error) {
+      console.error('Failed to parse structured JSON from blueprint');
     }
-  };
-
-  return {
-    structuredJson: extractJson(),
-  };
-}
-
-
-async updateUserProgress(userId: string, dto: UpdateProgressDto) {
-  const user = await this.UsersModel.findById(userId);
-  if (!user) throw new NotFoundException('User not found');
-
-  const progress = await this.progressModel.findOneAndUpdate(
-    { userId },
-    { $set: dto },
-    { new: true, upsert: true },
-  );
-
-  return {
-    success: true,
-    message: 'Progress updated successfully',
-    data: progress,
-  };
-}
-
-extractStructuredJson(aiResponse: string) {
-  try {
-    const jsonMatch = aiResponse.match(/```json([\s\S]*?)```/);
-    if (jsonMatch && jsonMatch[1]) {
-      return JSON.parse(jsonMatch[1].trim());
-    }
-  } catch (error) {
-    console.error('Failed to parse structured JSON from blueprint');
-  }
-  return {};
-}
-
-calculateCompletionPercentage(progress: any, blueprint: any) {
-  const calc = (done: string[], total: string[]) => {
-    if (!total?.length) return 0;
-    const matched = done.filter((item) => total.includes(item)).length;
-    return Math.round((matched / total.length) * 100);
-  };
-
-  return {
-    tasksCompleted: calc(progress.tasks || [], blueprint.tasks || []),
-    projectsCompleted: calc(progress.projects || [], blueprint.projects || []),
-    year1MilestonesCompleted: calc(progress.year1 || [], blueprint.milestones?.year1 || []),
-    year3MilestonesCompleted: calc(progress.year3 || [], blueprint.milestones?.year3 || []),
-    year5MilestonesCompleted: calc(progress.year5 || [], blueprint.milestones?.year5 || []),
-  };
-}
-async getUserProgress(userId: string) {
-  const user = await this.UsersModel.findById(userId);
-  if (!user) throw new NotFoundException('User not found');
-
-  const progress = await this.progressModel.findOne({ userId }) || {};
-  const blueprintRaw = user?.careerBlueprint;
-
-  let completionStats = null;
-
-  if (blueprintRaw) {
-    const parsed = this.extractStructuredJson(blueprintRaw);
-    completionStats = this.calculateCompletionPercentage(progress, parsed);
+    return {};
   }
 
-  return {
-    success: true,
-    message: 'User progress retrieved successfully',
-    data: {
-      progress,
-      completionStats,
-    },
-  };
-}
+  calculateCompletionPercentage(progress: any, blueprint: any) {
+    const calc = (done: string[], total: string[]) => {
+      if (!total?.length) return 0;
+      const matched = done.filter((item) => total.includes(item)).length;
+      return Math.round((matched / total.length) * 100);
+    };
 
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
+    return {
+      // tasksCompleted: calc(progress.tasks || [], blueprint.tasks || []),
+      // projectsCompleted: calc(progress.projects || [], blueprint.projects || []),
+      year1MilestonesCompleted: calc(
+        progress.year1 || [],
+        blueprint.fiveYearRoadmap?.year1 || [],
+      ),
+      year2MilestonesCompleted: calc(
+        progress.year2 || [],
+        blueprint.fiveYearRoadmap?.year2 || [],
+      ),
+      year3MilestonesCompleted: calc(
+        progress.year3 || [],
+        blueprint.fiveYearRoadmap?.year3 || [],
+      ),
+      year4FMilestonesCompleted: calc(
+        progress.year4 || [],
+        blueprint.fiveYearRoadmap?.year4 || [],
+      ),
+      year5MilestonesCompleted: calc(
+        progress.year5 || [],
+        blueprint.fiveYearRoadmap?.year5 || [],
+      ),
+    };
+  }
+  async getUserProgress(userId: string) {
+    const user = await this.UsersModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    const progress = (await this.progressModel.findOne({ userId })) || {};
+    const blueprintRaw = user?.careerBlueprint;
+
+    let completionStats = null;
+
+    if (blueprintRaw) {
+      const parsed = this.extractStructuredJson(blueprintRaw);
+      completionStats = this.calculateCompletionPercentage(progress, parsed);
+    }
+
+    return {
+      success: true,
+      message: 'User progress retrieved successfully',
+      data: {
+        progress,
+        completionStats,
+      },
+    };
+  }
+
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
   async updateUser(
     userId: string,
     payload: UpdateUserDto,
