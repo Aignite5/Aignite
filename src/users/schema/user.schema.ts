@@ -23,7 +23,7 @@ export class Users {
   email: string;
 
   @Prop()
-  specialty:string;
+  specialty: string;
 
   @Prop()
   date_of_birth: Date;
@@ -79,7 +79,6 @@ export class Users {
   @Prop({ default: new Date() })
   createdDate: Date;
 
-  
   // Academic Background
   @ApiProperty()
   // @Prop({ enum: ['O-Level', 'Diploma', 'Bachelor’s', 'Master’s and above'] })
@@ -134,8 +133,6 @@ export class Users {
   @Prop()
   currentJobTitle: string;
 
-
-
   // Work Experience
   @ApiProperty()
   @Prop()
@@ -179,8 +176,107 @@ export class Users {
   @Prop()
   additionalInfo: string; // Optional text input for personalization
 
-  @Prop({ type: String, default: null })  
+  @Prop({ type: String, default: null })
   careerBlueprint: string; // Stores the generated blueprint as a string
+
+  //////////////////////////////////////FOR MENTORS//////////////////////////////////////
+  //////////////////////////////////////FOR MENTORS//////////////////////////////////////
+  //////////////////////////////////////FOR MENTORS//////////////////////////////////////
+  //////////////////////////////////////FOR MENTORS//////////////////////////////////////
+  //////////////////////////////////////FOR MENTORS//////////////////////////////////////
+  //////////////////////////////////////FOR MENTORS//////////////////////////////////////
+  //////////////////////////////////////FOR MENTORS//////////////////////////////////////
+  @Prop({ required: false })
+  ProfessionalTitle: string;
+
+  @Prop({ required: false })
+  linkedInProfileUrl?: string;
+
+  @Prop({ required: false })
+  currentEmployer?: string;
+
+  @Prop({
+    required: false,
+    // enum: ['1-3 years', '4-7 years', '8-15 years', '15+ years'],
+  })
+  yearsOfExperience?: string;
+
+  @Prop({
+    type: [String],
+    // enum: [
+    //   'Technology',
+    //   'Finance',
+    //   'Healthcare',
+    //   'Education',
+    //   'Consulting',
+    //   'Manufacturing',
+    //   'Other',
+    // ],
+    default: [],
+  })
+  industryExpertise?: string[];
+
+  @Prop({
+    type: [String],
+    // enum: [
+    //   'AI & ML',
+    //   'Product Management',
+    //   'Software Engineering',
+    //   'Cybersecurity',
+    //   'Data Analytics',
+    //   'Leadership',
+    //   'Marketing',
+    //   'Entrepreneurship',
+    //   'Other',
+    // ],
+    default: [],
+  })
+  specializationAreas?: string[];
+
+  // 🎯 Mentorship Preferences
+  @Prop({
+    type: [String],
+    // enum: [
+    //   'Career Guidance',
+    //   'Technical Mentoring',
+    //   'Job Interview Prep',
+    //   'Leadership Coaching',
+    //   'Industry Insights',
+    //   'Project Guidance',
+    // ],
+    default: [],
+  })
+  focusAreas?: string[];
+
+  @Prop({
+    type: [String],
+    // enum: [
+    //   'Students',
+    //   'Career Changers',
+    //   'Early-Career Professionals',
+    //   'Startup Founders',
+    // ],
+    default: [],
+  })
+  preferredMenteeTypes?: string[];
+
+  @Prop({
+    type: [String],
+    // enum: [
+    //   '1-on-1 Sessions',
+    //   'Group Sessions',
+    //   'Async via Messaging',
+    //   'Webinars/Workshops',
+    // ],
+    default: [],
+  })
+  mentorshipFormat?: string[];
+
+  @Prop({
+    required: false,
+    // enum: ['1 hour/week', '2-3 hours/month', 'On-demand / Flexible'],
+  })
+  availability?: string;
 }
 
 export type UsersDocument = Users & Document;

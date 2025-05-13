@@ -39,6 +39,7 @@ import { Users } from './schema/user.schema';
 import { AzureOpenaiService } from 'src/azure-openai/azure-openai.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Progress } from './schema/progress.schema';
+import { UpdateMentorshipAndProfessionalInfoDto } from './dto/mentorship.dto';
 
 @Injectable()
 export class UsersService {
@@ -839,6 +840,41 @@ export class UsersService {
       this.logger.error(ex);
       throw ex;
     }
+  }
+
+  async updateMentorshipAndProfessionalInfo(
+    userId: string,
+    dto: UpdateMentorshipAndProfessionalInfoDto,
+  ): Promise<any> {
+    const user = await this.UsersModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    const updatableFields = [
+      'ProfessionalTitle',
+      'linkedInProfileUrl',
+      'currentEmployer',
+      'yearsOfExperience',
+      'industryExpertise',
+      'specializationAreas',
+      'focusAreas',
+      'preferredMenteeTypes',
+      'mentorshipFormat',
+      'availability',
+    ];
+
+    for (const field of updatableFields) {
+      if (dto[field] !== undefined) {
+        user[field] = dto[field];
+      }
+    }
+
+    await user.save();
+    return {
+      // data:updatedUser,
+      success: true,
+      code: HttpStatus.OK,
+      message: 'Updated',
+    };
   }
 
   @Cron(CronExpression.EVERY_WEEK)

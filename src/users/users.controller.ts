@@ -4,6 +4,7 @@ import { CreateMentorDto, CreateUserDto, UpdateProgressDto, UpdateUserDto } from
 import { ApiConsumes, ApiNotFoundResponse, ApiOperation, ApiParam, ApiProduces, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UpdatePasswordDTO } from 'src/utils/utils.types';
 import { OTPUserDTO } from 'src/auth/dto/auth.dto';
+import { UpdateMentorshipAndProfessionalInfoDto } from './dto/mentorship.dto';
 
 @ApiTags('Users') // This tag will group your API endpoints under "Courses" in Swagger
 @Controller('users')
@@ -133,6 +134,21 @@ export class UsersController {
     @Body() updateUser: UpdateUserDto,
   ): Promise<any> {
     return this.usersService.updateUser(userId, updateUser);
+  }
+
+    @Patch(':userId/update-mentorship-info')
+  @ApiOperation({ summary: 'Update mentorship and professional profile info' })
+  @ApiParam({ name: 'userId', description: 'MongoDB ObjectId of the user' })
+  @ApiResponse({
+    status: 200,
+    description: 'Mentorship and professional information updated successfully',
+  })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async updateMentorshipAndProfessionalInfo(
+    @Param('userId') userId: string,
+    @Body() dto: UpdateMentorshipAndProfessionalInfoDto,
+  ): Promise<any> {
+    return this.usersService.updateMentorshipAndProfessionalInfo(userId, dto);
   }
 
   @Post('create-mentor/sample-mentor')
