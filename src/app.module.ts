@@ -10,6 +10,7 @@ import { UsersModule } from './users/users.module';
 import { AzureOpenaiModule } from './azure-openai/azure-openai.module';
 import { ImpressionModule } from './impression/impression.module';
 import { SessionsModule } from './sessions/sessions.module';
+import { GoogletoolsModule } from './googletools/googletools.module';
 
 
 
@@ -25,6 +26,7 @@ import { SessionsModule } from './sessions/sessions.module';
     AzureOpenaiModule,
     ImpressionModule,
     SessionsModule,
+    GoogletoolsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

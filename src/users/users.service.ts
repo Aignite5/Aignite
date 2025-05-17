@@ -476,22 +476,54 @@ export class UsersService {
     };
   }
 
+
   async updateUserProgress(userId: string, dto: UpdateProgressDto) {
-    const user = await this.UsersModel.findById(userId);
-    if (!user) throw new NotFoundException('User not found');
+  const user = await this.UsersModel.findById(userId);
+  if (!user) throw new NotFoundException('User not found');
 
-    const progress = await this.progressModel.findOneAndUpdate(
-      { userId },
-      { $set: dto },
-      { new: true, upsert: true },
-    );
+  let progress = await this.progressModel.findOne({ userId });
 
-    return {
-      success: true,
-      message: 'Progress updated successfully',
-      data: progress,
-    };
+  if (!progress) {
+    // Create progress record if not found
+    progress = await this.progressModel.create({ userId });
   }
+
+  const fields = ['year1', 'year2', 'year3', 'year4', 'year5', 'tasks', 'projects'];
+
+  for (const field of fields) {
+    const dtoValues: string[] = dto[field];
+    if (Array.isArray(dtoValues)) {
+      const currentValues: string[] = progress[field] || [];
+      const newUniqueValues = dtoValues.filter(item => !currentValues.includes(item));
+      progress[field] = [...currentValues, ...newUniqueValues];
+    }
+  }
+
+  await progress.save();
+
+  return {
+    success: true,
+    message: 'Progress updated successfully',
+    data: progress,
+  };
+}
+
+  // async updateUserProgress(userId: string, dto: UpdateProgressDto) {
+  //   const user = await this.UsersModel.findById(userId);
+  //   if (!user) throw new NotFoundException('User not found');
+
+  //   const progress = await this.progressModel.findOneAndUpdate(
+  //     { userId },
+  //     { $set: dto },
+  //     { new: true, upsert: true },
+  //   );
+
+  //   return {
+  //     success: true,
+  //     message: 'Progress updated successfully',
+  //     data: progress,
+  //   };
+  // }
 
   extractStructuredJson(aiResponse: string) {
     try {
