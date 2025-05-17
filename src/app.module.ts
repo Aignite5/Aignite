@@ -26,7 +26,7 @@ import { GoogletoolsModule } from './googletools/googletools.module';
     AzureOpenaiModule,
     ImpressionModule,
     SessionsModule,
-    GoogletoolsModule,
+    // GoogletoolsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
