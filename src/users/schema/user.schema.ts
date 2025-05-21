@@ -189,6 +189,12 @@ export class Users {
   @Prop({ required: false })
   ProfessionalTitle: string;
 
+  @Prop({ default: 0 })
+  LitePlanPrice: number;
+
+  @Prop({ default: 0 })
+  StandardPlanPrice: number;
+
   @Prop({ required: false })
   linkedInProfileUrl?: string;
 

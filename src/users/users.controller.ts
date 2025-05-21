@@ -1,7 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, HttpStatus, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  HttpStatus,
+  Query,
+  Put,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
-import { CreateMentorDto, CreateUserDto, UpdateProgressDto, UpdateUserDto } from './dto/user.dto';
-import { ApiConsumes, ApiNotFoundResponse, ApiOperation, ApiParam, ApiProduces, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  CreateMentorDto,
+  CreateUserDto,
+  UpdatePlanPricesDto,
+  UpdateProgressDto,
+  UpdateUserDto,
+} from './dto/user.dto';
+import {
+  ApiConsumes,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiParam,
+  ApiProduces,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UpdatePasswordDTO } from 'src/utils/utils.types';
 import { OTPUserDTO } from 'src/auth/dto/auth.dto';
 import { UpdateMentorshipAndProfessionalInfoDto } from './dto/mentorship.dto';
@@ -25,7 +51,6 @@ export class UsersController {
       userId,
     );
   }
-
 
   @ApiOperation({ description: 'Resend OTP after login' })
   @ApiProduces('json')
@@ -82,23 +107,51 @@ export class UsersController {
     }
   }
 
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
   @Get(':id/blueprint/get-blueprint')
-  @ApiOperation({ summary: 'Get user by ID and return only the careerBlueprint field' })
-  @ApiParam({ name: 'id', required: true, example: '65f2c4a8b4d2e613e8a4f1b9', description: 'User ID' })
+  @ApiOperation({
+    summary: 'Get user by ID and return only the careerBlueprint field',
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    example: '65f2c4a8b4d2e613e8a4f1b9',
+    description: 'User ID',
+  })
   async getUserBlueprintById(@Param('id') userId: string) {
     return this.usersService.getUserBlueprintById(userId);
   }
 
   @Get(':id/blueprint/get-blueprint/full-structure')
-  @ApiOperation({ summary: 'Get user by ID and return only the careerBlueprint field' })
-  @ApiParam({ name: 'id', required: true, example: '65f2c4a8b4d2e613e8a4f1b9', description: 'User ID' })
+  @ApiOperation({
+    summary: 'Get user by ID and return only the careerBlueprint field',
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    example: '65f2c4a8b4d2e613e8a4f1b9',
+    description: 'User ID',
+  })
   async getFormattedUserBlueprintById(@Param('id') userId: string) {
     return this.usersService.getFormattedUserBlueprintById(userId);
+  }
+
+    @Get(':id/blueprint/shared-blueprint')
+  @ApiOperation({
+    summary: 'Get user by ID and return only the careerBlueprint field',
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    example: '65f2c4a8b4d2e613e8a4f1b9',
+    description: 'User ID',
+  })
+  async getBlueprintForSharing(@Param('id') userId: string) {
+    return this.usersService.getBlueprintForSharing(userId);
   }
 
   @Patch('blueprint/update/:userId/progress')
@@ -117,11 +170,11 @@ export class UsersController {
   async getProgress(@Param('userId') userId: string) {
     return this.usersService.getUserProgress(userId);
   }
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
-////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
+  ////////////////////////////////////////////BLUEPRINT////////////////////////////////
   @ApiOperation({ summary: 'Update a user' })
   @Patch('/user/:userId')
   @ApiParam({ name: 'userId', description: 'ID of the user to update' })
@@ -136,7 +189,7 @@ export class UsersController {
     return this.usersService.updateUser(userId, updateUser);
   }
 
-    @Patch(':userId/update-mentorship-info')
+  @Patch(':userId/update-mentorship-info')
   @ApiOperation({ summary: 'Update mentorship and professional profile info' })
   @ApiParam({ name: 'userId', description: 'MongoDB ObjectId of the user' })
   @ApiResponse({
@@ -151,10 +204,33 @@ export class UsersController {
     return this.usersService.updateMentorshipAndProfessionalInfo(userId, dto);
   }
 
+  @Put('mentors/:id/update-plan-prices')
+  @ApiOperation({ summary: 'Update plan prices for a user' })
+  @ApiParam({ name: 'id', required: true, description: 'User ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'Plan prices updated successfully',
+  })
+  async updatePlanPrices(
+    @Param('id') userId: string,
+    @Body() dto: UpdatePlanPricesDto,
+  ) {
+    return this.usersService.updateUserPlanPrices(userId, dto);
+  }
+   @Patch('promote-all-students')
+  @ApiOperation({ summary: 'Promote all users with role STUDENT to Talents' })
+  @ApiResponse({ status: 200, description: 'All students promoted to mentors' })
+  async promoteAllStudents() {
+    return this.usersService.promoteAllStudentsToMentors();
+  }
+
   @Post('create-mentor/sample-mentor')
   @ApiOperation({ summary: 'Create a new mentor profile' })
   @ApiResponse({ status: 201, description: 'Mentor created successfully' })
-  @ApiResponse({ status: 409, description: 'Mentor with this email already exists' })
+  @ApiResponse({
+    status: 409,
+    description: 'Mentor with this email already exists',
+  })
   async createMentor(@Body() dto: CreateMentorDto) {
     return this.usersService.createMentor(dto);
   }
@@ -163,37 +239,59 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users with role = Mentors' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
-  async getAllMentors(
-    @Query('page') page = 1,
-    @Query('limit') limit = 10,
-  ) {
+  async getAllMentors(@Query('page') page = 1, @Query('limit') limit = 10) {
     return this.usersService.getAllMentors(Number(page), Number(limit));
   }
-  
 
-  @Get("admin/allusers")
+  @Get('admin/allusers')
   @ApiOperation({ summary: 'Get all users with pagination' })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  async getAllUsers(@Query('page') page: number, @Query('limit') limit: number) {
+  async getAllUsers(
+    @Query('page') page: number,
+    @Query('limit') limit: number,
+  ) {
     return this.usersService.getAllUsers(page, limit);
   }
 
   @Get('admin/allusers/with-wild-card-search')
-  @ApiOperation({ summary: 'Get all users with pagination and wildcard search' })
-  @ApiQuery({ name: 'page', required: false, example: 1, description: 'Page number (default: 1)' })
-  @ApiQuery({ name: 'limit', required: false, example: 10, description: 'Number of users per page (default: 10)' })
-  @ApiQuery({ name: 'search', required: false, example: 'john', description: 'Wildcard search by name, email, or phone' })
+  @ApiOperation({
+    summary: 'Get all users with pagination and wildcard search',
+  })
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    example: 1,
+    description: 'Page number (default: 1)',
+  })
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    example: 10,
+    description: 'Number of users per page (default: 10)',
+  })
+  @ApiQuery({
+    name: 'search',
+    required: false,
+    example: 'john',
+    description: 'Wildcard search by name, email, or phone',
+  })
   async getAllUsersSearch(
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
     @Query('search') searchQuery?: string,
   ) {
-    return this.usersService.getAllUsersSearch(Number(page), Number(limit), searchQuery);
+    return this.usersService.getAllUsersSearch(
+      Number(page),
+      Number(limit),
+      searchQuery,
+    );
   }
 
   @Get('admin/allusers/count-per-day')
-  @ApiOperation({ summary: 'Count registered users per day within a date range' })
+  @ApiOperation({
+    summary: 'Count registered users per day within a date range',
+  })
   @ApiQuery({ name: 'startDate', type: String, example: '2024-02-01' })
   @ApiQuery({ name: 'endDate', type: String, example: '2024-02-10' })
   async countRegisteredUsersPerDay(
@@ -204,25 +302,38 @@ export class UsersController {
   }
 
   @Get('admin/allusers/weekly-growth')
-  @ApiOperation({ summary: 'Get percentage increase/decrease in registered users from last week' })
+  @ApiOperation({
+    summary:
+      'Get percentage increase/decrease in registered users from last week',
+  })
   async getWeeklyUserGrowth() {
     return this.usersService.getWeeklyUserGrowth();
   }
 
   @Get('admin/allusers/incomplete-academic')
-  @ApiOperation({ summary: 'Get users with incomplete academic background (with pagination)' })
+  @ApiOperation({
+    summary: 'Get users with incomplete academic background (with pagination)',
+  })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
   async getUsersWithIncompleteAcademicBackground(
     @Query('page') page: number,
     @Query('limit') limit: number,
   ) {
-    return this.usersService.getUsersWithIncompleteAcademicBackground(page, limit);
+    return this.usersService.getUsersWithIncompleteAcademicBackground(
+      page,
+      limit,
+    );
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete a user by ID' })
-  @ApiParam({ name: 'id', required: true, example: '65d1fbb8397a4b1b3d4e9f6a', description: 'User ID' })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    example: '65d1fbb8397a4b1b3d4e9f6a',
+    description: 'User ID',
+  })
   async deleteUser(@Param('id') userId: string) {
     return this.usersService.deleteUserById(userId);
   }
@@ -232,9 +343,22 @@ export class UsersController {
    */
   @Patch('status/:id')
   @ApiOperation({ summary: 'Suspend or unsuspend a user' })
-  @ApiParam({ name: 'id', required: true, example: '65d1fbb8397a4b1b3d4e9f6a', description: 'User ID' })
-  @ApiQuery({ name: 'status', required: true, example: false, description: 'Set true to suspend, false to unsuspend' })
-  async updateUserStatus(@Param('id') userId: string, @Query('status') status: string) {
+  @ApiParam({
+    name: 'id',
+    required: true,
+    example: '65d1fbb8397a4b1b3d4e9f6a',
+    description: 'User ID',
+  })
+  @ApiQuery({
+    name: 'status',
+    required: true,
+    example: false,
+    description: 'Set true to suspend, false to unsuspend',
+  })
+  async updateUserStatus(
+    @Param('id') userId: string,
+    @Query('status') status: string,
+  ) {
     return this.usersService.updateUserStatus(userId, status === 'true');
   }
 

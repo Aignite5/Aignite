@@ -7,8 +7,10 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
+  Min,
   MinLength,
 } from 'class-validator';
 import { AppRole } from 'src/utils/utils.constant';
@@ -514,6 +516,18 @@ export class UpdateProgressDto {
   @IsOptional()
   @IsArray()
   projects?: string[];
+}
+
+export class UpdatePlanPricesDto {
+  @ApiProperty({ example: 5000, description: 'Lite plan price in Naira' })
+  @IsNumber()
+  @Min(0)
+  LitePlanPrice: number;
+
+  @ApiProperty({ example: 10000, description: 'Standard plan price in Naira' })
+  @IsNumber()
+  @Min(0)
+  StandardPlanPrice: number;
 }
 
 export class CreateUserDto {}

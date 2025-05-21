@@ -13,6 +13,7 @@ import {
   CreateAccountDto,
   CreateMentorDto,
   CreateUserDto,
+  UpdatePlanPricesDto,
   UpdateProgressDto,
   UpdateUserDto,
   UserDto,
@@ -453,6 +454,29 @@ export class UsersService {
     const formatted = this.formatCareerBlueprint(user.careerBlueprint);
     return { success: true, userId, careerBlueprint: formatted };
   }
+
+  async getBlueprintForSharing(userId: string) {
+  const user = await this.UsersModel.findById(userId)
+    .select('careerBlueprint firstName lastName profilePic email')
+    .exec();
+
+  if (!user) {
+    throw new NotFoundException(`User with ID ${userId} not found`);
+  }
+
+  const formatted = this.formatCareerBlueprint(user.careerBlueprint);
+
+  return {
+    success: true,
+    userId,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    profilePic: user.profilePic,
+    email: user.email,
+    careerBlueprint: formatted,
+  };
+}
+
   formatCareerBlueprint(content: string) {
     const extractSection = (label: string) => {
       const regex = new RegExp(
@@ -476,6 +500,7 @@ export class UsersService {
     };
   }
 
+  
 
   async updateUserProgress(userId: string, dto: UpdateProgressDto) {
   const user = await this.UsersModel.findById(userId);
@@ -906,6 +931,38 @@ export class UsersService {
       success: true,
       code: HttpStatus.OK,
       message: 'Updated',
+    };
+  }
+
+  async updateUserPlanPrices(userId: string, dto: UpdatePlanPricesDto) {
+  const user = await this.UsersModel.findById(userId);
+  if (!user) throw new NotFoundException('User not found');
+
+  user.LitePlanPrice = dto.LitePlanPrice;
+  user.StandardPlanPrice = dto.StandardPlanPrice;
+
+  await user.save();
+
+  return {
+    success: true,
+    message: 'User plan prices updated successfully',
+    data: {
+      userId: user._id,
+      LitePlanPrice: user.LitePlanPrice,
+      StandardPlanPrice: user.StandardPlanPrice,
+    },
+  };
+}
+
+async promoteAllStudentsToMentors() {
+    const result = await this.UsersModel.updateMany(
+      { role: 'STUDENT' },
+      { $set: { role: 'Talent' } }
+    );
+
+    return {
+      success: true,
+      message: `${result.modifiedCount} users promoted to talents.`,
     };
   }
 
