@@ -12,6 +12,7 @@ import { ImpressionModule } from './impression/impression.module';
 import { SessionsModule } from './sessions/sessions.module';
 import { GoogletoolsModule } from './googletools/googletools.module';
 import { PaymentModule } from './payment/payment.module';
+import { ReviewModule } from './review/review.module';
 
 
 
@@ -28,6 +29,7 @@ import { PaymentModule } from './payment/payment.module';
     ImpressionModule,
     SessionsModule,
     PaymentModule,
+    ReviewModule,
     // GoogletoolsModule,
   ],
   controllers: [AppController],
