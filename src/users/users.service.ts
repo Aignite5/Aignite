@@ -40,7 +40,7 @@ import { Users } from './schema/user.schema';
 import { AzureOpenaiService } from 'src/azure-openai/azure-openai.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Progress } from './schema/progress.schema';
-import { UpdateMentorshipAndProfessionalInfoDto } from './dto/mentorship.dto';
+import { UpdateMentorshipProfileDto } from './dto/mentorship.dto';
 
 @Injectable()
 export class UsersService {
@@ -456,26 +456,26 @@ export class UsersService {
   }
 
   async getBlueprintForSharing(userId: string) {
-  const user = await this.UsersModel.findById(userId)
-    .select('careerBlueprint firstName lastName profilePic email')
-    .exec();
+    const user = await this.UsersModel.findById(userId)
+      .select('careerBlueprint firstName lastName profilePic email')
+      .exec();
 
-  if (!user) {
-    throw new NotFoundException(`User with ID ${userId} not found`);
+    if (!user) {
+      throw new NotFoundException(`User with ID ${userId} not found`);
+    }
+
+    const formatted = this.formatCareerBlueprint(user.careerBlueprint);
+
+    return {
+      success: true,
+      userId,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      profilePic: user.profilePic,
+      email: user.email,
+      careerBlueprint: formatted,
+    };
   }
-
-  const formatted = this.formatCareerBlueprint(user.careerBlueprint);
-
-  return {
-    success: true,
-    userId,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    profilePic: user.profilePic,
-    email: user.email,
-    careerBlueprint: formatted,
-  };
-}
 
   formatCareerBlueprint(content: string) {
     const extractSection = (label: string) => {
@@ -500,38 +500,46 @@ export class UsersService {
     };
   }
 
-  
-
   async updateUserProgress(userId: string, dto: UpdateProgressDto) {
-  const user = await this.UsersModel.findById(userId);
-  if (!user) throw new NotFoundException('User not found');
+    const user = await this.UsersModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
 
-  let progress = await this.progressModel.findOne({ userId });
+    let progress = await this.progressModel.findOne({ userId });
 
-  if (!progress) {
-    // Create progress record if not found
-    progress = await this.progressModel.create({ userId });
-  }
-
-  const fields = ['year1', 'year2', 'year3', 'year4', 'year5', 'tasks', 'projects'];
-
-  for (const field of fields) {
-    const dtoValues: string[] = dto[field];
-    if (Array.isArray(dtoValues)) {
-      const currentValues: string[] = progress[field] || [];
-      const newUniqueValues = dtoValues.filter(item => !currentValues.includes(item));
-      progress[field] = [...currentValues, ...newUniqueValues];
+    if (!progress) {
+      // Create progress record if not found
+      progress = await this.progressModel.create({ userId });
     }
+
+    const fields = [
+      'year1',
+      'year2',
+      'year3',
+      'year4',
+      'year5',
+      'tasks',
+      'projects',
+    ];
+
+    for (const field of fields) {
+      const dtoValues: string[] = dto[field];
+      if (Array.isArray(dtoValues)) {
+        const currentValues: string[] = progress[field] || [];
+        const newUniqueValues = dtoValues.filter(
+          (item) => !currentValues.includes(item),
+        );
+        progress[field] = [...currentValues, ...newUniqueValues];
+      }
+    }
+
+    await progress.save();
+
+    return {
+      success: true,
+      message: 'Progress updated successfully',
+      data: progress,
+    };
   }
-
-  await progress.save();
-
-  return {
-    success: true,
-    message: 'Progress updated successfully',
-    data: progress,
-  };
-}
 
   // async updateUserProgress(userId: string, dto: UpdateProgressDto) {
   //   const user = await this.UsersModel.findById(userId);
@@ -901,22 +909,24 @@ export class UsersService {
 
   async updateMentorshipAndProfessionalInfo(
     userId: string,
-    dto: UpdateMentorshipAndProfessionalInfoDto,
+    dto: UpdateMentorshipProfileDto,
   ): Promise<any> {
     const user = await this.UsersModel.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
     const updatableFields = [
-      'ProfessionalTitle',
-      'linkedInProfileUrl',
-      'currentEmployer',
-      'yearsOfExperience',
-      'industryExpertise',
-      'specializationAreas',
-      'focusAreas',
-      'preferredMenteeTypes',
-      'mentorshipFormat',
-      'availability',
+      'linkedInUrl',
+      'professionalTitle',
+      'shortBio',
+      'fieldsOfExpertise',
+      'careerLevelsSupported',
+      'supportTypes',
+      'mentorshipStyle',
+      'availabilityPerWeek',
+      'bestDaysAndTimes',
+      'offersPaidMentorship',
+      'monthlyPrice',
+      'cancellationPolicy',
     ];
 
     for (const field of updatableFields) {
@@ -935,29 +945,29 @@ export class UsersService {
   }
 
   async updateUserPlanPrices(userId: string, dto: UpdatePlanPricesDto) {
-  const user = await this.UsersModel.findById(userId);
-  if (!user) throw new NotFoundException('User not found');
+    const user = await this.UsersModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
 
-  user.LitePlanPrice = dto.LitePlanPrice;
-  user.StandardPlanPrice = dto.StandardPlanPrice;
+    user.LitePlanPrice = dto.LitePlanPrice;
+    user.StandardPlanPrice = dto.StandardPlanPrice;
 
-  await user.save();
+    await user.save();
 
-  return {
-    success: true,
-    message: 'User plan prices updated successfully',
-    data: {
-      userId: user._id,
-      LitePlanPrice: user.LitePlanPrice,
-      StandardPlanPrice: user.StandardPlanPrice,
-    },
-  };
-}
+    return {
+      success: true,
+      message: 'User plan prices updated successfully',
+      data: {
+        userId: user._id,
+        LitePlanPrice: user.LitePlanPrice,
+        StandardPlanPrice: user.StandardPlanPrice,
+      },
+    };
+  }
 
-async promoteAllStudentsToMentors() {
+  async promoteAllStudentsToMentors() {
     const result = await this.UsersModel.updateMany(
       { role: 'STUDENT' },
-      { $set: { role: 'Talent' } }
+      { $set: { role: 'Talent' } },
     );
 
     return {

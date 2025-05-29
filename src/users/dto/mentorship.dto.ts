@@ -7,6 +7,9 @@ import {
   IsUrl,
   ArrayNotEmpty,
   ArrayUnique,
+  IsBoolean,
+  IsNumber,
+  MaxLength,
 } from 'class-validator';
 
 export enum YearsOfExperience {
@@ -67,99 +70,192 @@ export enum Availability {
   FLEXIBLE = 'On-demand / Flexible',
 }
 
-export class UpdateMentorshipAndProfessionalInfoDto {
+export class UpdateMentorshipProfileDto {
+  /** 🪪 Step 1: Basic Information */
+
+  @ApiPropertyOptional({ example: 'https://linkedin.com/in/janedoe' })
+  @IsOptional()
+  @IsString()
+  linkedInUrl?: string;
+
+  @ApiPropertyOptional({ example: 'Product Manager at Google' })
+  @IsOptional()
+  @IsString()
+  professionalTitle?: string;
+
   @ApiPropertyOptional({
-    example: 'Data Scientist',
-    description: 'Current professional title or role',
+    example: 'Experienced PM passionate about empowering women in tech.',
   })
   @IsOptional()
   @IsString()
-  ProfessionalTitle: string;
+  @MaxLength(300)
+  shortBio?: string;
 
+  /** 🧠 Step 2: Expertise & Focus Areas */
   @ApiPropertyOptional({
-    example: 'https://linkedin.com/in/johndoe',
-    description: 'LinkedIn profile URL',
+    example: ['Product Management', 'Agile', 'Startups'],
+    type: [String],
   })
   @IsOptional()
-  @IsUrl()
-  linkedInProfileUrl?: string;
+  @IsArray()
+  @IsString({ each: true })
+  fieldsOfExpertise?: string[];
 
   @ApiPropertyOptional({
-    example: 'Google',
-    description: 'Current employer or organization',
+    example: ['entry', 'mid', 'technical'],
+    description:
+      'Supported career levels. Options: entry, mid, technical, founder',
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  careerLevelsSupported?: string[];
+
+  @ApiPropertyOptional({
+    example: ['career guidance', 'mock interviews'],
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  supportTypes?: string[];
+
+  /** 🕒 Step 3: Availability & Preferences */
+  @ApiPropertyOptional({
+    example: 'both',
+    enum: ['1-on-1', 'async', 'both'],
+  })
+  @IsOptional()
+  @IsEnum(['1-on-1', 'async', 'both'])
+  mentorshipStyle?: '1-on-1' | 'async' | 'both';
+
+  @ApiPropertyOptional({ example: '2 mentees' })
+  @IsOptional()
+  @IsString()
+  availabilityPerWeek?: string;
+
+  @ApiPropertyOptional({
+    example: ['Monday mornings', 'Friday evenings'],
+    type: [String],
+  })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  bestDaysAndTimes?: string[];
+
+  /** 💰 Step 4: Mentorship Type */
+  @ApiPropertyOptional({ example: true })
+  @IsOptional()
+  @IsBoolean()
+  offersPaidMentorship?: boolean;
+
+  @ApiPropertyOptional({ example: 20000 })
+  @IsOptional()
+  @IsNumber()
+  monthlyPrice?: number;
+
+  @ApiPropertyOptional({
+    example: 'Cancel up to 24 hours before the session.',
   })
   @IsOptional()
   @IsString()
-  currentEmployer?: string;
-
-  @ApiPropertyOptional({
-    enum: YearsOfExperience,
-    description: 'Years of professional experience',
-  })
-  @IsOptional()
-  @IsEnum(YearsOfExperience)
-  yearsOfExperience?: YearsOfExperience;
-
-  @ApiPropertyOptional({
-    enum: IndustryExpertise,
-    isArray: true,
-    description: 'Industry expertise areas',
-  })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(IndustryExpertise, { each: true })
-  @ArrayUnique()
-  industryExpertise?: IndustryExpertise[];
-
-  @ApiPropertyOptional({
-    enum: SpecializationAreas,
-    isArray: true,
-    description: 'Specialization areas',
-  })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(SpecializationAreas, { each: true })
-  @ArrayUnique()
-  specializationAreas?: SpecializationAreas[];
-
-  @ApiPropertyOptional({
-    enum: FocusAreas,
-    isArray: true,
-    description: 'Preferred mentorship focus areas',
-  })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(FocusAreas, { each: true })
-  @ArrayUnique()
-  focusAreas?: FocusAreas[];
-
-  @ApiPropertyOptional({
-    enum: PreferredMenteeTypes,
-    isArray: true,
-    description: 'Preferred types of mentees',
-  })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(PreferredMenteeTypes, { each: true })
-  @ArrayUnique()
-  preferredMenteeTypes?: PreferredMenteeTypes[];
-
-  @ApiPropertyOptional({
-    enum: MentorshipFormat,
-    isArray: true,
-    description: 'Preferred mentorship format',
-  })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(MentorshipFormat, { each: true })
-  @ArrayUnique()
-  mentorshipFormat?: MentorshipFormat[];
-
-  @ApiPropertyOptional({
-    enum: Availability,
-    description: 'Availability for mentorship',
-  })
-  @IsOptional()
-  @IsEnum(Availability)
-  availability?: Availability;
+  cancellationPolicy?: string;
 }
+
+// export class UpdateMentorshipAndProfessionalInfoDto {
+//   @ApiPropertyOptional({
+//     example: 'Data Scientist',
+//     description: 'Current professional title or role',
+//   })
+//   @IsOptional()
+//   @IsString()
+//   ProfessionalTitle: string;
+
+//   @ApiPropertyOptional({
+//     example: 'https://linkedin.com/in/johndoe',
+//     description: 'LinkedIn profile URL',
+//   })
+//   @IsOptional()
+//   @IsUrl()
+//   linkedInProfileUrl?: string;
+
+//   @ApiPropertyOptional({
+//     example: 'Google',
+//     description: 'Current employer or organization',
+//   })
+//   @IsOptional()
+//   @IsString()
+//   currentEmployer?: string;
+
+//   @ApiPropertyOptional({
+//     enum: YearsOfExperience,
+//     description: 'Years of professional experience',
+//   })
+//   @IsOptional()
+//   @IsEnum(YearsOfExperience)
+//   yearsOfExperience?: YearsOfExperience;
+
+//   @ApiPropertyOptional({
+//     enum: IndustryExpertise,
+//     isArray: true,
+//     description: 'Industry expertise areas',
+//   })
+//   @IsOptional()
+//   @IsArray()
+//   @IsEnum(IndustryExpertise, { each: true })
+//   @ArrayUnique()
+//   industryExpertise?: IndustryExpertise[];
+
+//   @ApiPropertyOptional({
+//     enum: SpecializationAreas,
+//     isArray: true,
+//     description: 'Specialization areas',
+//   })
+//   @IsOptional()
+//   @IsArray()
+//   @IsEnum(SpecializationAreas, { each: true })
+//   @ArrayUnique()
+//   specializationAreas?: SpecializationAreas[];
+
+//   @ApiPropertyOptional({
+//     enum: FocusAreas,
+//     isArray: true,
+//     description: 'Preferred mentorship focus areas',
+//   })
+//   @IsOptional()
+//   @IsArray()
+//   @IsEnum(FocusAreas, { each: true })
+//   @ArrayUnique()
+//   focusAreas?: FocusAreas[];
+
+//   @ApiPropertyOptional({
+//     enum: PreferredMenteeTypes,
+//     isArray: true,
+//     description: 'Preferred types of mentees',
+//   })
+//   @IsOptional()
+//   @IsArray()
+//   @IsEnum(PreferredMenteeTypes, { each: true })
+//   @ArrayUnique()
+//   preferredMenteeTypes?: PreferredMenteeTypes[];
+
+//   @ApiPropertyOptional({
+//     enum: MentorshipFormat,
+//     isArray: true,
+//     description: 'Preferred mentorship format',
+//   })
+//   @IsOptional()
+//   @IsArray()
+//   @IsEnum(MentorshipFormat, { each: true })
+//   @ArrayUnique()
+//   mentorshipFormat?: MentorshipFormat[];
+
+//   @ApiPropertyOptional({
+//     enum: Availability,
+//     description: 'Availability for mentorship',
+//   })
+//   @IsOptional()
+//   @IsEnum(Availability)
+//   availability?: Availability;
+// }

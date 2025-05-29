@@ -1,5 +1,9 @@
 // payment.service.ts
-import { Injectable, NotFoundException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Payment, PaymentDocument } from './schemas/payment.schema';
 import { Model } from 'mongoose';
@@ -23,9 +27,12 @@ export class PaymentService {
     const user = await this.userModel.findById(dto.userId);
     if (!user) throw new NotFoundException('User not found');
 
-    const amount = dto.selectedPlan === 'LITE'
-      ? mentor.LitePlanPrice
-      : mentor.StandardPlanPrice;
+    const amount =
+      dto.selectedPlan === 'LITE'
+        ? // ? mentor.LitePlanPrice
+          // : mentor.StandardPlanPrice;
+          mentor.monthlyPrice
+        : mentor.monthlyPrice;
 
     const reference = await generateUniqueKey(15);
 
@@ -63,39 +70,37 @@ export class PaymentService {
         message: 'Payment initialized',
         paymentLink: res.data.data.authorization_url,
       };
-
     } catch (error) {
       console.error('Paystack error:', error?.response?.data || error.message);
       throw new InternalServerErrorException('Failed to initialize payment');
     }
   }
 
-async getPaymentsByUserId(userId: string) {
-  const payments = await this.paymentModel
-    .find({ userId })
-    .populate('userId', 'firstName lastName')
-    .populate('mentorId', 'firstName lastName')
-    .exec();
+  async getPaymentsByUserId(userId: string) {
+    const payments = await this.paymentModel
+      .find({ userId })
+      .populate('userId', 'firstName lastName')
+      .populate('mentorId', 'firstName lastName')
+      .exec();
 
-  return {
-    success: true,
-    message: 'Payments fetched by userId',
-    data: payments,
-  };
-}
+    return {
+      success: true,
+      message: 'Payments fetched by userId',
+      data: payments,
+    };
+  }
 
-async getPaymentsByMentorId(mentorId: string) {
-  const payments = await this.paymentModel
-    .find({ mentorId })
-    .populate('userId', 'firstName lastName')
-    .populate('mentorId', 'firstName lastName')
-    .exec();
+  async getPaymentsByMentorId(mentorId: string) {
+    const payments = await this.paymentModel
+      .find({ mentorId })
+      .populate('userId', 'firstName lastName')
+      .populate('mentorId', 'firstName lastName')
+      .exec();
 
-  return {
-    success: true,
-    message: 'Payments fetched by mentorId',
-    data: payments,
-  };
-}
-
+    return {
+      success: true,
+      message: 'Payments fetched by mentorId',
+      data: payments,
+    };
+  }
 }

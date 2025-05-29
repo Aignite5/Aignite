@@ -30,7 +30,7 @@ import {
 } from '@nestjs/swagger';
 import { UpdatePasswordDTO } from 'src/utils/utils.types';
 import { OTPUserDTO } from 'src/auth/dto/auth.dto';
-import { UpdateMentorshipAndProfessionalInfoDto } from './dto/mentorship.dto';
+import { UpdateMentorshipProfileDto } from './dto/mentorship.dto';
 
 @ApiTags('Users') // This tag will group your API endpoints under "Courses" in Swagger
 @Controller('users')
@@ -199,7 +199,7 @@ export class UsersController {
   @ApiResponse({ status: 404, description: 'User not found' })
   async updateMentorshipAndProfessionalInfo(
     @Param('userId') userId: string,
-    @Body() dto: UpdateMentorshipAndProfessionalInfoDto,
+    @Body() dto: UpdateMentorshipProfileDto,
   ): Promise<any> {
     return this.usersService.updateMentorshipAndProfessionalInfo(userId, dto);
   }

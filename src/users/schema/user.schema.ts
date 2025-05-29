@@ -186,8 +186,41 @@ export class Users {
   //////////////////////////////////////FOR MENTORS//////////////////////////////////////
   //////////////////////////////////////FOR MENTORS//////////////////////////////////////
   //////////////////////////////////////FOR MENTORS//////////////////////////////////////
-  @Prop({ required: false })
-  ProfessionalTitle: string;
+  /** 🪪 Step 1: Basic Information */
+  @Prop()
+  linkedInUrl?: string;
+
+  @Prop()
+  professionalTitle?: string;
+  
+  @Prop({ maxlength: 300 })
+  shortBio?: string;
+  /** 🧠 Step 2: Expertise & Focus Areas */
+  @Prop({ type: [String], default: [] })
+  fieldsOfExpertise: string[];
+
+  @Prop({ type: [String], default: [] })
+  careerLevelsSupported: string[]; // ['entry', 'mid', 'technical', 'founder']
+
+  @Prop({ type: [String], default: [] })
+  supportTypes: string[]; // ['guidance', 'projects', 'insights', etc.]
+
+  /** 🕒 Step 3: Availability & Preferences */
+  @Prop({ enum: ['1-on-1', 'async', 'both'], default: '1-on-1' })
+  mentorshipStyle: '1-on-1' | 'async' | 'both';
+
+  @Prop() availabilityPerWeek?: string; // e.g., "2 mentees" or "4 hours"
+
+  @Prop({ type: [String], default: [] }) // Example: ['Monday mornings', 'Fridays after 5pm']
+  bestDaysAndTimes: string[];
+
+  /** 💰 Step 4: Mentorship Type */
+  @Prop({ default: false })
+  offersPaidMentorship: boolean;
+
+  @Prop() monthlyPrice?: number; // e.g., for 4x 1hr sessions + Q&A
+
+  @Prop() cancellationPolicy?: string;
 
   @Prop({ default: 0 })
   LitePlanPrice: number;
@@ -195,94 +228,60 @@ export class Users {
   @Prop({ default: 0 })
   StandardPlanPrice: number;
 
-  @Prop({ required: false })
-  linkedInProfileUrl?: string;
+  // @Prop({ required: false })
+  // ProfessionalTitle: string;
 
-  @Prop({ required: false })
-  currentEmployer?: string;
+  // @Prop({ default: 0 })
+  // LitePlanPrice: number;
 
-  @Prop({
-    required: false,
-    // enum: ['1-3 years', '4-7 years', '8-15 years', '15+ years'],
-  })
-  yearsOfExperience?: string;
+  // @Prop({ default: 0 })
+  // StandardPlanPrice: number;
 
-  @Prop({
-    type: [String],
-    // enum: [
-    //   'Technology',
-    //   'Finance',
-    //   'Healthcare',
-    //   'Education',
-    //   'Consulting',
-    //   'Manufacturing',
-    //   'Other',
-    // ],
-    default: [],
-  })
-  industryExpertise?: string[];
+  // @Prop({ required: false })
+  // linkedInProfileUrl?: string;
 
-  @Prop({
-    type: [String],
-    // enum: [
-    //   'AI & ML',
-    //   'Product Management',
-    //   'Software Engineering',
-    //   'Cybersecurity',
-    //   'Data Analytics',
-    //   'Leadership',
-    //   'Marketing',
-    //   'Entrepreneurship',
-    //   'Other',
-    // ],
-    default: [],
-  })
-  specializationAreas?: string[];
+  // @Prop({ required: false })
+  // currentEmployer?: string;
 
-  // 🎯 Mentorship Preferences
-  @Prop({
-    type: [String],
-    // enum: [
-    //   'Career Guidance',
-    //   'Technical Mentoring',
-    //   'Job Interview Prep',
-    //   'Leadership Coaching',
-    //   'Industry Insights',
-    //   'Project Guidance',
-    // ],
-    default: [],
-  })
-  focusAreas?: string[];
+  // @Prop({
+  //   required: false,
+  // })
+  // yearsOfExperience?: string;
 
-  @Prop({
-    type: [String],
-    // enum: [
-    //   'Students',
-    //   'Career Changers',
-    //   'Early-Career Professionals',
-    //   'Startup Founders',
-    // ],
-    default: [],
-  })
-  preferredMenteeTypes?: string[];
+  // @Prop({
+  //   type: [String],
+  //   default: [],
+  // })
+  // industryExpertise?: string[];
 
-  @Prop({
-    type: [String],
-    // enum: [
-    //   '1-on-1 Sessions',
-    //   'Group Sessions',
-    //   'Async via Messaging',
-    //   'Webinars/Workshops',
-    // ],
-    default: [],
-  })
-  mentorshipFormat?: string[];
+  // @Prop({
+  //   type: [String],
+  //   default: [],
+  // })
+  // specializationAreas?: string[];
 
-  @Prop({
-    required: false,
-    // enum: ['1 hour/week', '2-3 hours/month', 'On-demand / Flexible'],
-  })
-  availability?: string;
+  // @Prop({
+  //   type: [String],
+  //   default: [],
+  // })
+  // focusAreas?: string[];
+
+  // @Prop({
+  //   type: [String],
+  //   default: [],
+  // })
+  // preferredMenteeTypes?: string[];
+
+  // @Prop({
+  //   type: [String],
+  //   default: [],
+  // })
+  // mentorshipFormat?: string[];
+
+  // @Prop({
+  //   required: false,
+  // })
+  // availability?: string;
 }
 
 export type UsersDocument = Users & Document;
