@@ -243,20 +243,39 @@ export class UsersController {
   }
 
   @Get('mentors/by-verification-status')
-  @ApiOperation({ summary: 'Fetch mentors by verification status' })
+  @ApiOperation({
+    summary: 'Fetch mentors by verification status with pagination',
+  })
   @ApiQuery({
     name: 'status',
     required: true,
     type: Boolean,
-    description: 'true for active mentors, false for inactive',
+    description: 'true or false',
   })
-  @ApiResponse({
-    status: 200,
-    description: 'Mentors fetched by verification status',
+  @ApiQuery({
+    name: 'page',
+    required: false,
+    type: Number,
+    description: 'Page number (default: 1)',
   })
-  async getMentorsByVerificationStatus(@Query('status') status: string) {
+  @ApiQuery({
+    name: 'limit',
+    required: false,
+    type: Number,
+    description: 'Page size (default: 10)',
+  })
+  @ApiResponse({ status: 200, description: 'Paginated list of mentors' })
+  async getMentorsByVerificationStatus(
+    @Query('status') status: string,
+    @Query('page') page = 1,
+    @Query('limit') limit = 10,
+  ) {
     const parsedStatus = status === 'true';
-    return this.usersService.getMentorsByVerificationStatus(parsedStatus);
+    return this.usersService.getMentorsByVerificationStatus(
+      parsedStatus,
+      +page,
+      +limit,
+    );
   }
 
   @Post('create-mentor/sample-mentor')

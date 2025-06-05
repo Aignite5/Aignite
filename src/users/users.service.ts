@@ -1174,18 +1174,33 @@ export class UsersService {
     };
   }
 
-  async getMentorsByVerificationStatus(status: boolean): Promise<any> {
-  const mentors = await this.UsersModel
-    .find({ role: 'MENTOR', mentorVerificationStatus: status })
-    .select('firstName lastName email mentorVerificationStatus')
-    .exec();
+async getMentorsByVerificationStatus(
+  status: boolean,
+  page: number,
+  limit: number,
+): Promise<any> {
+  const skip = (page - 1) * limit;
+
+  const [mentors, total] = await Promise.all([
+    this.UsersModel
+      .find({ role: 'Mentor', mentorVerificationStatus: status })
+      .select('firstName lastName email mentorVerificationStatus')
+      .skip(skip)
+      .limit(limit)
+      .exec(),
+    this.UsersModel.countDocuments({ role: 'Mentor', mentorVerificationStatus: status }),
+  ]);
 
   return {
     success: true,
-    count: mentors.length,
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
     data: mentors,
   };
 }
+
 
   async getAllUsersSearch(
     page: number = 1,
