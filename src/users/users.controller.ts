@@ -14,6 +14,7 @@ import { UsersService } from './users.service';
 import {
   CreateMentorDto,
   CreateUserDto,
+  ToggleMentorStatusDto,
   UpdatePlanPricesDto,
   UpdateProgressDto,
   UpdateUserDto,
@@ -217,6 +218,21 @@ export class UsersController {
   ) {
     return this.usersService.updateUserPlanPrices(userId, dto);
   }
+
+  @Post('mentor/:id/toggle-verification')
+  @ApiOperation({ summary: 'Activate or deactivate mentor verification status' })
+  @ApiParam({ name: 'id', description: 'User ID of the mentor' })
+  @ApiResponse({
+    status: 200,
+    description: 'Mentor verification status updated',
+  })
+  async toggleMentorVerification(
+    @Param('id') userId: string,
+    @Body() dto: ToggleMentorStatusDto,
+  ) {
+    return this.usersService.toggleMentorVerificationStatus(userId, dto.status);
+  }
+
    @Patch('promote-all-students')
   @ApiOperation({ summary: 'Promote all users with role STUDENT to Talents' })
   @ApiResponse({ status: 200, description: 'All students promoted to mentors' })

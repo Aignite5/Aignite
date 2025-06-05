@@ -529,5 +529,9 @@ export class UpdatePlanPricesDto {
   @Min(0)
   StandardPlanPrice: number;
 }
-
+export class ToggleMentorStatusDto {
+  @ApiProperty({ description: 'Set to true to activate, false to deactivate' })
+  @IsBoolean()
+  status: boolean;
+}
 export class CreateUserDto {}

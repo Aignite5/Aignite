@@ -944,6 +944,27 @@ export class UsersService {
     };
   }
 
+   async toggleMentorVerificationStatus(
+    userId: string,
+    status: boolean,
+  ): Promise<any> {
+    const user = await this.UsersModel.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    user.mentorVerificationStatus = status;
+    await user.save();
+
+    return {
+      success: true,
+      statusCode: HttpStatus.OK,
+      message: `Mentor has been ${status ? 'activated' : 'deactivated'}`,
+      data: {
+        userId: user._id,
+        mentorVerificationStatus: user.mentorVerificationStatus,
+      },
+    };
+  }
+
   async updateUserPlanPrices(userId: string, dto: UpdatePlanPricesDto) {
     const user = await this.UsersModel.findById(userId);
     if (!user) throw new NotFoundException('User not found');

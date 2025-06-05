@@ -192,7 +192,7 @@ export class Users {
 
   @Prop()
   professionalTitle?: string;
-  
+
   @Prop({ maxlength: 300 })
   shortBio?: string;
   /** 🧠 Step 2: Expertise & Focus Areas */
@@ -218,7 +218,7 @@ export class Users {
   @Prop({ default: false })
   offersPaidMentorship: boolean;
 
-  @Prop() monthlyPrice?: number; // e.g., for 4x 1hr sessions + Q&A
+  @Prop() monthlyPrice?: number;
 
   @Prop() cancellationPolicy?: string;
 
@@ -228,60 +228,9 @@ export class Users {
   @Prop({ default: 0 })
   StandardPlanPrice: number;
 
-  // @Prop({ required: false })
-  // ProfessionalTitle: string;
-
-  // @Prop({ default: 0 })
-  // LitePlanPrice: number;
-
-  // @Prop({ default: 0 })
-  // StandardPlanPrice: number;
-
-  // @Prop({ required: false })
-  // linkedInProfileUrl?: string;
-
-  // @Prop({ required: false })
-  // currentEmployer?: string;
-
-  // @Prop({
-  //   required: false,
-  // })
-  // yearsOfExperience?: string;
-
-  // @Prop({
-  //   type: [String],
-  //   default: [],
-  // })
-  // industryExpertise?: string[];
-
-  // @Prop({
-  //   type: [String],
-  //   default: [],
-  // })
-  // specializationAreas?: string[];
-
-  // @Prop({
-  //   type: [String],
-  //   default: [],
-  // })
-  // focusAreas?: string[];
-
-  // @Prop({
-  //   type: [String],
-  //   default: [],
-  // })
-  // preferredMenteeTypes?: string[];
-
-  // @Prop({
-  //   type: [String],
-  //   default: [],
-  // })
-  // mentorshipFormat?: string[];
-
-  // @Prop({
-  //   required: false,
-  // })
-  // availability?: string;
+  @ApiProperty()
+  @Prop({ default: false })
+  mentorVerificationStatus: boolean;
 }
 
 export type UsersDocument = Users & Document;
