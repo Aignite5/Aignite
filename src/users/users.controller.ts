@@ -141,7 +141,7 @@ export class UsersController {
     return this.usersService.getFormattedUserBlueprintById(userId);
   }
 
-    @Get(':id/blueprint/shared-blueprint')
+  @Get(':id/blueprint/shared-blueprint')
   @ApiOperation({
     summary: 'Get user by ID and return only the careerBlueprint field',
   })
@@ -220,7 +220,9 @@ export class UsersController {
   }
 
   @Post('mentor/:id/toggle-verification')
-  @ApiOperation({ summary: 'Activate or deactivate mentor verification status' })
+  @ApiOperation({
+    summary: 'Activate or deactivate mentor verification status',
+  })
   @ApiParam({ name: 'id', description: 'User ID of the mentor' })
   @ApiResponse({
     status: 200,
@@ -232,12 +234,29 @@ export class UsersController {
   ) {
     return this.usersService.toggleMentorVerificationStatus(userId, dto.status);
   }
-    @Get('all-metors/mentors')
+  @Get('all-metors/mentors')
   @ApiOperation({ summary: 'Get all users with role = Mentors' })
   @ApiQuery({ name: 'page', required: false, type: Number })
   @ApiQuery({ name: 'limit', required: false, type: Number })
   async getAllMentors(@Query('page') page = 1, @Query('limit') limit = 10) {
     return this.usersService.getAllMentors(Number(page), Number(limit));
+  }
+
+  @Get('mentors/by-verification-status')
+  @ApiOperation({ summary: 'Fetch mentors by verification status' })
+  @ApiQuery({
+    name: 'status',
+    required: true,
+    type: Boolean,
+    description: 'true for active mentors, false for inactive',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Mentors fetched by verification status',
+  })
+  async getMentorsByVerificationStatus(@Query('status') status: string) {
+    const parsedStatus = status === 'true';
+    return this.usersService.getMentorsByVerificationStatus(parsedStatus);
   }
 
   @Post('create-mentor/sample-mentor')
@@ -250,14 +269,12 @@ export class UsersController {
   async createMentor(@Body() dto: CreateMentorDto) {
     return this.usersService.createMentor(dto);
   }
-   @Patch('promote-all-students')
+  @Patch('promote-all-students')
   @ApiOperation({ summary: 'Promote all users with role STUDENT to Talents' })
   @ApiResponse({ status: 200, description: 'All students promoted to mentors' })
   async promoteAllStudents() {
     return this.usersService.promoteAllStudentsToMentors();
   }
-
-
 
   @Get('admin/allusers')
   @ApiOperation({ summary: 'Get all users with pagination' })

@@ -1174,6 +1174,19 @@ export class UsersService {
     };
   }
 
+  async getMentorsByVerificationStatus(status: boolean): Promise<any> {
+  const mentors = await this.UsersModel
+    .find({ role: 'MENTOR', mentorVerificationStatus: status })
+    .select('firstName lastName email mentorVerificationStatus')
+    .exec();
+
+  return {
+    success: true,
+    count: mentors.length,
+    data: mentors,
+  };
+}
+
   async getAllUsersSearch(
     page: number = 1,
     limit: number = 10,
