@@ -1156,7 +1156,7 @@ export class UsersService {
     const skip = (page - 1) * limit;
 
     const mentors = await this.UsersModel.find({ role: 'Mentor' })
-      .select('firstName lastName email specialty profileImageUrl')
+      .select('firstName lastName email specialty profileImageUrl mentorVerificationStatus')
       .skip(skip)
       .limit(limit)
       .exec();

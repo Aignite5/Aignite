@@ -232,12 +232,12 @@ export class UsersController {
   ) {
     return this.usersService.toggleMentorVerificationStatus(userId, dto.status);
   }
-
-   @Patch('promote-all-students')
-  @ApiOperation({ summary: 'Promote all users with role STUDENT to Talents' })
-  @ApiResponse({ status: 200, description: 'All students promoted to mentors' })
-  async promoteAllStudents() {
-    return this.usersService.promoteAllStudentsToMentors();
+    @Get('all-metors/mentors')
+  @ApiOperation({ summary: 'Get all users with role = Mentors' })
+  @ApiQuery({ name: 'page', required: false, type: Number })
+  @ApiQuery({ name: 'limit', required: false, type: Number })
+  async getAllMentors(@Query('page') page = 1, @Query('limit') limit = 10) {
+    return this.usersService.getAllMentors(Number(page), Number(limit));
   }
 
   @Post('create-mentor/sample-mentor')
@@ -250,14 +250,14 @@ export class UsersController {
   async createMentor(@Body() dto: CreateMentorDto) {
     return this.usersService.createMentor(dto);
   }
-
-  @Get('all-metors/mentors')
-  @ApiOperation({ summary: 'Get all users with role = Mentors' })
-  @ApiQuery({ name: 'page', required: false, type: Number })
-  @ApiQuery({ name: 'limit', required: false, type: Number })
-  async getAllMentors(@Query('page') page = 1, @Query('limit') limit = 10) {
-    return this.usersService.getAllMentors(Number(page), Number(limit));
+   @Patch('promote-all-students')
+  @ApiOperation({ summary: 'Promote all users with role STUDENT to Talents' })
+  @ApiResponse({ status: 200, description: 'All students promoted to mentors' })
+  async promoteAllStudents() {
+    return this.usersService.promoteAllStudentsToMentors();
   }
+
+
 
   @Get('admin/allusers')
   @ApiOperation({ summary: 'Get all users with pagination' })
