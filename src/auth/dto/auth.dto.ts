@@ -83,6 +83,16 @@ export class ThirdPartyLoginDTO {
 
     @ApiProperty({ nullable: true, description: 'Nullable' })
     phoneNumber?: string;
+
+      @ApiProperty({
+    example: 'USER',
+    description: 'User role',
+    enum: AppRole,
+    default: AppRole.USER,
+  })
+  @IsOptional()
+  @IsEnum(AppRole, { message: 'Role must be one of USER, ADMIN, or MODERATOR' })
+  role: AppRole;
 }
 
 export class AuthUserDataDTO {

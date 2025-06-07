@@ -234,6 +234,17 @@ export class UsersController {
   ) {
     return this.usersService.toggleMentorVerificationStatus(userId, dto.status);
   }
+
+  // @Patch('mentors/deactivate-all')
+  // @ApiOperation({ summary: 'Deactivate all mentors' })
+  // @ApiResponse({
+  //   status: 200,
+  //   description: 'All mentors deactivated successfully',
+  // })
+  // async deactivateAllMentors() {
+  //   return this.usersService.deactivateAllMentors();
+  // }
+
   @Get('all-metors/mentors')
   @ApiOperation({ summary: 'Get all users with role = Mentors' })
   @ApiQuery({ name: 'page', required: false, type: Number })

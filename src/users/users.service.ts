@@ -965,6 +965,19 @@ export class UsersService {
     };
   }
 
+  async deactivateAllMentors(): Promise<any> {
+  const result = await this.UsersModel.updateMany(
+    { role: 'Mentor', mentorVerificationStatus: false },
+    { $set: { mentorVerificationStatus: false } }
+  );
+
+  return {
+    success: true,
+    updatedCount: result.modifiedCount,
+    message: 'All mentors have been deactivated (mentorVerificationStatus set to false)',
+  };
+}
+
   async updateUserPlanPrices(userId: string, dto: UpdatePlanPricesDto) {
     const user = await this.UsersModel.findById(userId);
     if (!user) throw new NotFoundException('User not found');
