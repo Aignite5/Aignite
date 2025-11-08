@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BaseResponseTypeDTO } from '../../utils/utils.types';
 import { AppRole, AuthProvider } from '../../utils/utils.constant';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 // import { User } from '@entities/index';
 
 export class AuthResponse {
