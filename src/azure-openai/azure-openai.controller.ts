@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { AzureOpenaiService } from './azure-openai.service';
-import { CreateAzureOpenaiDto } from './dto/azure-openai.dto';
+import { CreateAzureOpenaiDto, GenerateCareerBlueprintDto } from './dto/azure-openai.dto';
 import { UpdateAzureOpenaiDto } from './dto/update-azure-openai.dto';
 import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
@@ -10,20 +10,6 @@ import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class AzureOpenaiController {
   constructor(private readonly azureOpenaiService: AzureOpenaiService) {}
 
-  @Post('completion')
-  @ApiOperation({ summary: 'Get a completion from Azure OpenAI' })
-  @ApiResponse({ status: 200, description: 'Completion generated successfully' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        prompt: { type: 'string', example: 'When was Microsoft founded?' },
-      },
-    },
-  })
-  async getCompletion(@Body('prompt') prompt: string): Promise<string> {
-    return this.azureOpenaiService.getCompletion(prompt);
-  }
 
   @Get(':id/career-blueprint')
   @ApiOperation({ summary: 'Generate Career Blueprint' })
@@ -39,8 +25,18 @@ export class AzureOpenaiController {
     return await this.azureOpenaiService.generateCareerBlueprint(userId);
   }
 
-  @Get('inhouse/:id/career-blueprint')
-  @ApiOperation({ summary: 'Generate Career Blueprint' })
+
+
+  @Post(':id/career-blueprint/selected-career')
+  @ApiOperation({
+    summary: 'Generate a personalized 5-year career blueprint',
+    description:
+      `Generates an inspiring, personalized, 5-year AI-powered career plan based on the user's selected career and full profile.`,
+  })
+  @ApiBody({
+    type: GenerateCareerBlueprintDto,
+    description: 'Payload containing the userId and the selected career',
+  })
   @ApiResponse({
     status: 200,
     description: 'Career blueprint generated successfully',
@@ -49,7 +45,17 @@ export class AzureOpenaiController {
     status: 404,
     description: 'User not found',
   })
-  async generateCareerBlueprintInHouse(@Param('id') userId: string) {
-    return await this.azureOpenaiService.generateCareerBlueprintInHouse(userId);
+  @ApiResponse({
+    status: 500,
+    description: 'AI failed to generate a response',
+  })
+  async generateCareerBlueprintSeletedCareer(
+    @Body() dto: GenerateCareerBlueprintDto,
+  ) {
+    return this.azureOpenaiService.generateCareerBlueprintForSelectedCareer(
+      dto.userId,
+      dto.careerData,
+    );
   }
+
 }
