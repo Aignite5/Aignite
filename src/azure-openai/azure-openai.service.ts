@@ -202,121 +202,92 @@ Ensure the text is inspiring and the JSON is clean and complete.`;
 
 
 
-
-async generateCareerBlueprintForSelectedCareer(userId: string, careerData: string) {
-  console.log('Generating career blueprint for user:', userId, 'with selected career:', careerData);
-  const user = await this.UserSrv.findUserById(userId);
-  if (!user) {
-    throw new NotFoundException('User not found');
-  }
-
-const prompt = `You are an expert career coach AI assistant.
-
-Your task is to generate a strictly personalized 5-year career blueprint based entirely on the user's **selected career**. 
-
-🔥 **STRICT RULES — MUST FOLLOW**
-1. **Everything** in the blueprint must align with the selected career:  
-   - Career vision  
-   - Skills snapshot  
-   - Skill gaps  
-   - Suggested pathways  
-   - Salary expectations  
-   - 5-year roadmap  
-   - All examples and subpoints  
-2. **Do NOT reuse roles, skills, or examples from the sample blueprint.**  
-   The sample is ONLY a structural template.  
-3. The blueprint MUST deeply reflect the selected career, using domain-specific terminology, job activities, required competencies, and realistic growth milestones.
-4. The JSON section MUST match the selected career and MUST NOT contain generic AI-career examples.
-
----
-
-## 🎯 Selected Career (MUST influence 100% of output):
-**${careerData}**
-
----
-
-## 📘 Structure Instructions
-
-Follow the structure and tone of this sample blueprint, BUT rewrite everything to fit the selected career only.  
-Do NOT copy sample content.  
-Do NOT mention AI unless the selected career is AI-related.
-
----
-
-## SECTION 1 — Narrative Blueprint (Human-Readable)
-
-You MUST generate the following (all tailored to the selected career):
-
-### 🌟 5-Year Career Vision
-A compelling vision about how the user grows *in the selected career* over 5 years.
-
-### 🧠 Skills Snapshot
-- Technical skills relevant to the selected career  
-- Soft skills relevant to the selected career  
-- Match ratings for each group
-
-### 🔍 Skill Gaps to Work On
-List only gaps relevant to the selected career.
-
-### 🚀 Suggested Career Pathways
-Provide **3 roles** the user can pursue within or around the selected career.  
-Each must include:
-- Title  
-- Clear description  
-- What the role requires  
-- Salary estimate in 5 years (realistic range)
-
-### 🗺️ 5-Year Milestone Roadmap
-For Year 1 to Year 5:  
-Give **3–4 actionable, career-specific** milestones per year.
-
----
-
-## SECTION 2 — JSON OUTPUT (MUST follow selected career)
-
-After the narrative, append a valid JSON object:
-
-\\\json
-{
-  "careerVision": "string",
-  "skillsSnapshot": {
-    "technical": {
-      "skills": ["string"],
-      "matchRating": "string"
-    },
-    "soft": {
-      "skills": ["string"],
-      "matchRating": "string"
+  async generateCareerPathSuggestions(userId: string) {
+    const user = await this.UserSrv.findUserById(userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
     }
+
+    const prompt = `You are an expert career advisor.
+Based ONLY on the user's profile below, generate **8 highly realistic and personalized career path suggestions** that align with their background, skills, interests, and goals.
+
+Return ONLY a valid JSON array in this exact structure (no extra text, no markdown):
+[
+  {
+    "title": "Senior Full-Stack Engineer",
+    "shortDescription": "Lead development of complex web applications using React, Node.js and cloud infrastructure.",
+    "whyItFits": "Matches your 5+ years in JavaScript/TypeScript, interest in startups, and preference for remote work.",
+    "growthPotential": "High demand, clear path to Staff/Principal or Engineering Manager roles.",
+    "estimatedSalary5Years": "$180k–$280k+ USD"
   },
-  "skillGaps": ["string"],
-  "suggestedCareerPathways": [
-    {
-      "title": "string",
-      "description": "string",
-      "requirements": "string",
-      "estimatedSalary": "string"
+  ...
+]
+
+User Profile:
+- Age range: ${user.data.ageRange || 'Not specified'}
+- Highest Education: ${user.data.highestLevelOfEducation || 'Not specified'}
+- Field of Study: ${user.data.fieldOfStudy?.join(', ') || 'Not specified'}
+- Technical Skills: ${user.data.technicalSkills?.join(', ') || 'Not specified'}
+- Soft Skills: ${user.data.softSkills?.join(', ') || 'Not specified'}
+- Work Experience: ${user.data.workExperience || 'Not specified'}
+- Industries of Interest: ${user.data.industriesOfInterest?.join(', ') || 'Not specified'}
+- Career Goals: ${user.data.Career_goals?.join(', ') || 'Not specified'}
+- Preferred Work Environments: ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
+- Career Challenges: ${user.data.careerChallenges?.join(', ') || 'Not specified'}
+
+Return clean, valid JSON only. Maximum 8 suggestions.`;
+
+    const response = await this.client.chat.completions.create({
+      messages: [{ role: 'user', content: prompt }],
+      model: 'gpt-4o',
+      temperature: 0.7,
+      max_tokens: 1200,
+    });
+
+    // const raw = response.used[0]?.message?.content?.trim() || '';
+    const raw = response.choices[0]?.message?.content?.trim();
+
+    let suggestions;
+    try {
+      suggestions = JSON.parse(raw);
+    } catch (e) {
+      // Fallback: extract JSON from markdown if needed
+      const match = raw.match(/\[[\s\S]*\]/);
+      if (match) suggestions = JSON.parse(match[0]);
+      else throw new Error('Invalid JSON from AI');
     }
-  ],
-  "fiveYearRoadmap": {
-    "year1": ["string"],
-    "year2": ["string"],
-    "year3": ["string"],
-    "year4": ["string"],
-    "year5": ["string"]
+
+    // Save suggestions for later selection
+    await this.UsersModel.updateOne(
+      { _id: userId },
+      { $set: { careerPathSuggestions: suggestions } }
+    );
+
+    return {
+      success: true,
+      code: 200,
+      message: 'Career path suggestions generated',
+      data: suggestions,
+    };
   }
-}
-\\\
 
-⚠ **STRICT REQUIREMENTS FOR JSON**  
-- All values MUST be related to the selected career.  
-- No generic placeholders like “AI Product Manager” unless it matches the selected career.  
-- Salary ranges MUST be realistic for the chosen career.
 
----
 
-## User Profile (use to personalize the blueprint)
+  async generateCareerBlueprintForSelectedCareer(
+    userId: string,
+    selectedCareer: string // comes from frontend selection
+  ) {
+    const user = await this.UserSrv.findUserById(userId);
+    if (!user) throw new NotFoundException('User not found');
 
+    const careerTitle = selectedCareer;
+
+    const prompt = `You are an expert career coach AI.
+Generate a deeply personalized, inspiring 5-year career blueprint for this exact career: **${careerTitle}**
+
+Everything MUST be 100% tailored to this career only — no generic content, no AI examples unless the career is AI-related.
+
+## User Profile (use to personalize)
 - Career Dream: ${user.data.Carreer_Dream || 'Not specified'}
 - Fields of Study: ${user.data.fieldOfStudy?.join(', ') || 'Not specified'}
 - Highest Education: ${user.data.highestLevelOfEducation || 'Not specified'}
@@ -328,47 +299,129 @@ After the narrative, append a valid JSON object:
 - Preferred Work Environments: ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
 - Learning Preferences: ${user.data.learningPreferences?.join(', ') || 'Not specified'}
 - Career Goals: ${user.data.Career_goals?.join(', ') || 'Not specified'}
-- Skill Development Strategies: ${user.data.Skill_developement_strategies?.join(', ') || 'Not specified'}
 - Career Challenges: ${user.data.careerChallenges?.join(', ') || 'Not specified'}
 
-Write everything in a deeply inspiring tone.  
-Ensure the JSON is clean, valid, and tailored 100% to the selected career.`;
+## Output Format
 
+First, write a beautiful human-readable narrative with these sections:
+### 5-Year Career Vision
+### Skills Snapshot (with match ratings)
+### Skill Gaps to Work On
+### Suggested Career Pathways (3 specific roles inside/around this career)
+### 5-Year Milestone Roadmap (Year 1–5, 3–4 milestones each)
 
+Then, at the very end, output ONLY this exact JSON structure (no markdown, no extra text):
 
-  const response = await this.client.chat.completions.create({
-    messages: [
-      { role: 'system', content: 'You are a career coach AI assistant.' },
-      { role: 'user', content: prompt },
-    ],
-    model: 'gpt-4o',
-    max_tokens: 2000,
-  });
+{
+  "careerVision": "string",
+  "selectedCareerTitle": "${careerTitle}",
+  "skillsSnapshot": {
+    "technical": {
+      "skills": ["string"],
+      "matchRating": "Strong / Moderate / Needs Development"
+    },
+    "soft": {
+      "skills": ["string"],
+      "matchRating": "Strong / Moderate / Needs Development"
+    }
+  },
+  "skillGaps": ["string"],
+  "suggestedCareerPathways": [
+    {
+      "title": "string",
+      "description": "string",
+      "requirements": "string",
+      "estimatedSalary": "string (5-year realistic range)"
+    }
+  ],
+  "fiveYearRoadmap": {
+    "year1": ["string"],
+    "year2": ["string"],
+    "year3": ["string"],
+    "year4": ["string"],
+    "year5": ["string"]
+  }
+}
 
-  const aiResponse = response.choices[0]?.message?.content?.trim();
+Use inspiring, confident tone. All content must feel custom-written for someone pursuing **${careerTitle}**.`;
 
-  if (!aiResponse) {
+    const response = await this.client.chat.completions.create({
+      messages: [
+        { role: 'system', content: 'You are a world-class career coach.' },
+        { role: 'user', content: prompt },
+      ],
+      model: 'gpt-4o',
+      temperature: 0.7,
+      max_tokens: 3000,
+    });
+
+    const aiResponse = response.choices[0]?.message?.content?.trim();
+    if (!aiResponse) {
+      return { success: false, code: 500, message: 'No response from AI' };
+    }
+
+    // Extract JSON from the end (most reliable)
+    const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+    let parsedJson = null;
+    if (jsonMatch) {
+      try {
+        parsedJson = JSON.parse(jsonMatch[0]);
+      } catch (e) {
+        console.error('JSON parse failed:', e);
+      }
+    }
+
+    // Save full response + parsed JSON
+    await this.UsersModel.updateOne(
+      { _id: userId },
+      {
+        $set: {
+          selectedCareer: careerTitle,
+          careerBlueprintRaw: aiResponse,
+          careerBlueprint: parsedJson || aiResponse,
+          careerBlueprintGeneratedAt: new Date(),
+        },
+      }
+    );
+
     return {
-      success: false,
-      code: 500,
-      message: 'AI did not return a response. Please try again.',
+      success: true,
+      code: 200,
+      message: 'Career blueprint generated successfully',
+      data: {
+        narrative: aiResponse,
+        json: parsedJson,
+        selectedCareer: careerTitle,
+      },
     };
   }
 
-  const record = await this.UsersModel.findOne({ _id: userId });
-  record.careerBlueprint = aiResponse;
-  await record.save();
 
-  const formatted = this.formatCareerBlueprint(aiResponse);
 
-  return {
-    success: true,
-    code: 200,
-    message: 'Career blueprint generated successfully',
-    data: aiResponse,
-    formatted,
-  };
+  formatCareerBlueprint(content: string) {
+    const extractSection = (label: string) => {
+      const regex = new RegExp(`\\*\\*${label}\\*\\*\\s*:?\\s*([\\s\\S]*?)(?=\\n\\*\\*|\\n###|\\n---|$)`);
+      const match = content.match(regex);
+      return match ? match[1].trim() : '';
+    };
+
+    const extractJson = () => {
+      const jsonMatch = content.match(/```json([\s\S]*?)```/);
+      try {
+        return jsonMatch ? JSON.parse(jsonMatch[1].trim()) : null;
+      } catch (e) {
+        return null;
+      }
+    };
+
+    return {
+      structuredJson: extractJson()
+    };
+  }
+
+
 }
+
 
 //   const prompt = `As an experienced career coach,
 
@@ -488,28 +541,3 @@ Ensure the JSON is clean, valid, and tailored 100% to the selected career.`;
 // - Career Challenges: ${user.data.careerChallenges?.join(', ') || 'Not specified'}
 
 // Ensure the text is inspiring and the JSON is clean and complete.`;
-
-
-  formatCareerBlueprint(content: string) {
-    const extractSection = (label: string) => {
-      const regex = new RegExp(`\\*\\*${label}\\*\\*\\s*:?\\s*([\\s\\S]*?)(?=\\n\\*\\*|\\n###|\\n---|$)`);
-      const match = content.match(regex);
-      return match ? match[1].trim() : '';
-    };
-
-    const extractJson = () => {
-      const jsonMatch = content.match(/```json([\s\S]*?)```/);
-      try {
-        return jsonMatch ? JSON.parse(jsonMatch[1].trim()) : null;
-      } catch (e) {
-        return null;
-      }
-    };
-
-    return {
-      structuredJson: extractJson()
-    };
-  }
-
-
-}
