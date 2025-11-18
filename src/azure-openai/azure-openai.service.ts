@@ -372,17 +372,21 @@ Use inspiring, confident tone. All content must feel custom-written for someone 
     }
 
     // Save full response + parsed JSON
-    await this.UsersModel.updateOne(
-      { _id: userId },
-      {
-        $set: {
-          selectedCareer: careerTitle,
-          careerBlueprintRaw: aiResponse,
-          careerBlueprint: parsedJson || aiResponse,
-          careerBlueprintGeneratedAt: new Date(),
-        },
-      }
-    );
+    const record = await this.UsersModel.findOne({ _id: userId });
+    record.careerBlueprint = aiResponse;
+    await record.save();
+
+    // await this.UsersModel.updateOne(
+    //   { _id: userId },
+    //   {
+    //     $set: {
+    //       selectedCareer: careerTitle,
+    //       careerBlueprintRaw: aiResponse,
+    //       careerBlueprint: parsedJson || aiResponse,
+    //       careerBlueprintGeneratedAt: new Date(),
+    //     },
+    //   }
+    // );
 
     return {
       success: true,
