@@ -209,7 +209,7 @@ Ensure the text is inspiring and the JSON is clean and complete.`;
     }
 
     const prompt = `You are an expert career advisor.
-Based ONLY on the user's profile below, generate **4 highly realistic and personalized career path suggestions** that align with their background, skills, interests, and goals.
+Based ONLY on the user's profile below, generate **3 highly realistic and personalized career path suggestions** that align with their background, skills, interests, and goals.
 
 Return ONLY a valid JSON array in this exact structure (no extra text, no markdown):
 [
