@@ -253,3 +253,85 @@ Use the following User Profile:
 - Career Challenges: ${user.data.careerChallenges?.join(', ') || 'Not specified'}
 
 Ensure the text is inspiring and the JSON is clean and complete.`;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const prompt = `You are an expert career coach AI.
+Generate a deeply personalized, inspiring 5-year career blueprint for this exact career: **${careerTitle}**
+
+Everything MUST be 100% tailored to this career only — no generic content, no AI examples unless the career is AI-related.
+
+## User Profile (use to personalize)
+- Career Dream: ${user.data.Carreer_Dream || 'Not specified'}
+- Fields of Study: ${user.data.fieldOfStudy?.join(', ') || 'Not specified'}
+- Highest Education: ${user.data.highestLevelOfEducation || 'Not specified'}
+- Age range: ${user.data.ageRange || 'Not specified'}
+- Industries of Interest: ${user.data.industriesOfInterest?.join(', ') || 'Not specified'}
+- Technical Skills: ${user.data.technicalSkills?.join(', ') || 'Not specified'}
+- Soft Skills: ${user.data.softSkills?.join(', ') || 'Not specified'}
+- Work Experience: ${user.data.workExperience || 'Not specified'}
+- Preferred Work Environments: ${user.data.preferredWorkEnvironments?.join(', ') || 'Not specified'}
+- Learning Preferences: ${user.data.learningPreferences?.join(', ') || 'Not specified'}
+- Career Goals: ${user.data.Career_goals?.join(', ') || 'Not specified'}
+- Career Challenges: ${user.data.careerChallenges?.join(', ') || 'Not specified'}
+
+## Output Format
+
+First, write a beautiful human-readable narrative with these sections:
+### 5-Year Career Vision
+### Skills Snapshot (with match ratings)
+### Skill Gaps to Work On
+### Suggested Career Pathways (3 specific roles inside/around this career)
+### 5-Year Milestone Roadmap (Year 1–5, 3–4 milestones each)
+
+Then, at the very end, output ONLY this exact JSON structure (no markdown, no extra text):
+
+{
+  "careerVision": "string",
+  "selectedCareerTitle": "${careerTitle}",
+  "skillsSnapshot": {
+    "technical": {
+      "skills": ["string"],
+      "matchRating": "Strong / Moderate / Needs Development"
+    },
+    "soft": {
+      "skills": ["string"],
+      "matchRating": "Strong / Moderate / Needs Development"
+    }
+  },
+  "skillGaps": ["string"],
+  "suggestedCareerPathways": [
+    {
+      "title": "string",
+      "description": "string",
+      "requirements": "string",
+      "estimatedSalary": "string (5-year realistic range)"
+    }
+  ],
+  "fiveYearRoadmap": {
+    "year1": ["string"],
+    "year2": ["string"],
+    "year3": ["string"],
+    "year4": ["string"],
+    "year5": ["string"]
+  }
+}
+
+Use inspiring, confident tone. All content must feel custom-written for someone pursuing **${careerTitle}**.`;
