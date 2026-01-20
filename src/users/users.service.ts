@@ -54,7 +54,7 @@ export class UsersService {
     @InjectModel(Users.name) private readonly UsersModel: Model<Users>,
     @InjectModel(Progress.name) private progressModel: Model<Progress>,
     // private readonly OpenAiSrv: AzureOpenaiService,
-  ) {}
+  ) { }
 
   async createuser(
     CreateUser: CreateAccountDto, // : Promise<User>
@@ -631,281 +631,324 @@ export class UsersService {
   ////////////////////////////////////////////BLUEPRINT////////////////////////////////
   ////////////////////////////////////////////BLUEPRINT////////////////////////////////
   ////////////////////////////////////////////BLUEPRINT////////////////////////////////
-  async updateUser(
-    userId: string,
-    payload: UpdateUserDto,
-  ): Promise<BaseResponseTypeDTO> {
-    try {
-      // checkForRequiredFields(['userId'], userId);
-      const record = await this.UsersModel.findOne({ _id: userId });
+async updateUser(
+  userId: string,
+  payload: any,
+): Promise<BaseResponseTypeDTO> {
+  this.logger.log('UpdateUser called');
+  this.logger.debug(`UserId: ${userId}`);
+  this.logger.debug(`Incoming Payload: ${JSON.stringify(payload)}`);
 
-      if (!record) {
-        throw new NotFoundException(
-          `User not found, therefore cannot be updated.`,
-        );
-      }
+  // ✅ Generic flattening: works for nested or flat payloads
+  const updateData =
+    payload?.user && typeof payload.user === 'object'
+      ? payload.user
+      : payload;
 
-      if (!record?.id) {
-        throw new NotFoundException('User with id not found');
-      }
-      // if ('enableFaceId' in payload) {
-      //   record.enableFaceId = payload.enableFaceId;
-      // }
-      if ('allowEmailNotifications' in payload) {
-        record.allowEmailNotifications = payload.allowEmailNotifications;
-      }
-      if ('allowSmsNotifications' in payload) {
-        record.allowSmsNotifications = payload.allowSmsNotifications;
-      }
-      if ('allowPushNotifications' in payload) {
-        record.allowPushNotifications = payload.allowPushNotifications;
-      }
-      // if (payload.dob && record.dob !== payload.dob) {
-      //   validatePastDate(payload.dob, 'dob');
-      //   record.dob = payload.dob;
-      // }
-      if (payload.phoneNumber && payload.phoneNumber !== record.phoneNumber) {
-        record.phoneNumber = payload.phoneNumber;
-      }
-      if (payload.email && payload.email !== record.email) {
-        validateEmailField(payload.email);
-        record.email = payload.email.toUpperCase();
-      }
-      if (payload.firstName && payload.firstName !== record.firstName) {
-        record.firstName = payload.firstName.toUpperCase();
-      }
-      if (payload.lastName && payload.lastName !== record.lastName) {
-        record.lastName = payload.lastName.toUpperCase();
-      }
-      // if (payload.gender && payload.gender !== record.gender) {
-      //   compareEnumValueFields(payload.gender, Object.values(Gender), 'gender');
-      //   record.gender = payload.gender;
-      // }
-      // if (payload.password) {
-      //   record.password = await hashPassword(payload.password);
-      // }
-      if (
-        payload.profileImageUrl &&
-        payload.profileImageUrl !== record.profileImageUrl
-      ) {
-        validateURLField(payload.profileImageUrl, 'profileImageUrl');
-        record.profileImageUrl = payload.profileImageUrl;
-      }
+  this.logger.debug(`Resolved Update Data: ${JSON.stringify(updateData)}`);
 
-      // Academic Background
-      if (
-        payload.highestLevelOfEducation &&
-        payload.highestLevelOfEducation !== record.highestLevelOfEducation
-      ) {
-        record.highestLevelOfEducation = payload.highestLevelOfEducation;
-      }
-      if (
-        payload.fieldOfStudy &&
-        JSON.stringify(payload.fieldOfStudy) !==
-          JSON.stringify(record.fieldOfStudy)
-      ) {
-        record.fieldOfStudy = payload.fieldOfStudy;
-      }
-      if (
-        payload.universityOrInstitution &&
-        payload.universityOrInstitution !== record.universityOrInstitution
-      ) {
-        record.universityOrInstitution = payload.universityOrInstitution;
-      }
+  const updated = await this.UsersModel.findByIdAndUpdate(
+    userId,
+    { $set: updateData },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
 
-      // Career Interests
-      if (
-        payload.industriesOfInterest &&
-        JSON.stringify(payload.industriesOfInterest) !==
-          JSON.stringify(record.industriesOfInterest)
-      ) {
-        record.industriesOfInterest = payload.industriesOfInterest;
-      }
-      if (
-        payload.currentJobTitle &&
-        payload.currentJobTitle !== record.currentJobTitle
-      ) {
-        record.currentJobTitle = payload.currentJobTitle;
-      }
-      if (
-        payload.careerExperience &&
-        payload.careerExperience !== record.careerExperience
-      ) {
-        record.careerExperience = payload.careerExperience;
-      }
-
-      if (
-        payload.Carreer_Dream &&
-        payload.Carreer_Dream !== record.Carreer_Dream
-      ) {
-        record.Carreer_Dream = payload.Carreer_Dream;
-      }
-
-      if (
-        payload.Career_goals &&
-        payload.Career_goals !== record.Career_goals
-      ) {
-        record.Career_goals = payload.Career_goals;
-      }
-
-      if (
-        payload.Skill_developement_strategies &&
-        payload.Skill_developement_strategies !==
-          record.Skill_developement_strategies
-      ) {
-        record.Skill_developement_strategies =
-          payload.Skill_developement_strategies;
-      }
-
-      // Hobbies & Skills
-      if (
-        payload.hobbies &&
-        JSON.stringify(payload.hobbies) !== JSON.stringify(record.hobbies)
-      ) {
-        record.hobbies = payload.hobbies;
-      }
-      if (
-        payload.skills &&
-        JSON.stringify(payload.skills) !== JSON.stringify(record.skills)
-      ) {
-        record.skills = payload.skills;
-      }
-
-      // Future Aspirations
-      if (
-        payload.futureAspirations &&
-        payload.futureAspirations !== record.futureAspirations
-      ) {
-        record.futureAspirations = payload.futureAspirations;
-      }
-      // Academic Background
-      if (
-        payload.highestLevelOfEducation &&
-        payload.highestLevelOfEducation !== record.highestLevelOfEducation
-      ) {
-        record.highestLevelOfEducation = payload.highestLevelOfEducation;
-      }
-      if (
-        payload.fieldOfStudy &&
-        JSON.stringify(payload.fieldOfStudy) !==
-          JSON.stringify(record.fieldOfStudy)
-      ) {
-        record.fieldOfStudy = payload.fieldOfStudy;
-      }
-      if (
-        payload.universityOrInstitution &&
-        payload.universityOrInstitution !== record.universityOrInstitution
-      ) {
-        record.universityOrInstitution = payload.universityOrInstitution;
-      }
-
-      // Career Interests & Work Experience
-      if (
-        payload.currentStatus &&
-        payload.currentStatus !== record.currentStatus
-      ) {
-        record.currentStatus = payload.currentStatus;
-      }
-      if (
-        payload.industriesOfInterest &&
-        JSON.stringify(payload.industriesOfInterest) !==
-          JSON.stringify(record.industriesOfInterest)
-      ) {
-        record.industriesOfInterest = payload.industriesOfInterest;
-      }
-      if (
-        payload.currentJobTitle &&
-        payload.currentJobTitle !== record.currentJobTitle
-      ) {
-        record.currentJobTitle = payload.currentJobTitle;
-      }
-      if (
-        payload.careerExperience &&
-        payload.careerExperience !== record.careerExperience
-      ) {
-        record.careerExperience = payload.careerExperience;
-      }
-      if (
-        payload.workExperience &&
-        payload.workExperience !== record.workExperience
-      ) {
-        record.workExperience = payload.workExperience;
-      }
-      if (
-        payload.excitingWork &&
-        payload.excitingWork !== record.excitingWork
-      ) {
-        record.excitingWork = payload.excitingWork;
-      }
-
-      if (payload.ageRange && payload.ageRange !== record.ageRange) {
-        record.ageRange = payload.ageRange;
-      }
-
-      // Skills
-      if (
-        payload.technicalSkills &&
-        JSON.stringify(payload.technicalSkills) !==
-          JSON.stringify(record.technicalSkills)
-      ) {
-        record.technicalSkills = payload.technicalSkills;
-      }
-      if (
-        payload.softSkills &&
-        JSON.stringify(payload.softSkills) !== JSON.stringify(record.softSkills)
-      ) {
-        record.softSkills = payload.softSkills;
-      }
-
-      // Preferences
-      if (
-        payload.preferredWorkEnvironments &&
-        JSON.stringify(payload.preferredWorkEnvironments) !==
-          JSON.stringify(record.preferredWorkEnvironments)
-      ) {
-        record.preferredWorkEnvironments = payload.preferredWorkEnvironments;
-      }
-      if (
-        payload.learningPreferences &&
-        JSON.stringify(payload.learningPreferences) !==
-          JSON.stringify(record.learningPreferences)
-      ) {
-        record.learningPreferences = payload.learningPreferences;
-      }
-      if (
-        payload.careerChallenges &&
-        JSON.stringify(payload.careerChallenges) !==
-          JSON.stringify(record.careerChallenges)
-      ) {
-        record.careerChallenges = payload.careerChallenges;
-      }
-
-      // Future Aspirations & Additional Info
-      if (
-        payload.futureAspirations &&
-        payload.futureAspirations !== record.futureAspirations
-      ) {
-        record.futureAspirations = payload.futureAspirations;
-      }
-      if (
-        payload.additionalInfo &&
-        payload.additionalInfo !== record.additionalInfo
-      ) {
-        record.additionalInfo = payload.additionalInfo;
-      }
-
-      const updatedUser = await record.save();
-      return {
-        // data:updatedUser,
-        success: true,
-        code: HttpStatus.OK,
-        message: 'Updated',
-      };
-    } catch (ex) {
-      this.logger.error(ex);
-      throw ex;
-    }
+  if (!updated) {
+    this.logger.warn(`UpdateUser failed - user not found: ${userId}`);
+    throw new NotFoundException('User not found');
   }
+
+  this.logger.log(`UpdateUser success for userId: ${userId}`);
+
+  return {
+    success: true,
+    code: HttpStatus.OK,
+    message: 'Updated',
+  };
+}
+
+
+
+  // async updateUser(
+  //   userId: string,
+  //   payload: UpdateUserDto,
+  // ): Promise<BaseResponseTypeDTO> {
+  //   console.log('UpdateUser userId:', userId);
+  //   console.log('UpdateUser payload:', payload);
+  //   try {
+  //     // checkForRequiredFields(['userId'], userId);
+  //     const record = await this.UsersModel.findOne({ _id: userId });
+
+  //     if (!record) {
+  //       throw new NotFoundException(
+  //         `User not found, therefore cannot be updated.`,
+  //       );
+  //     }
+
+  //     if (!record?.id) {
+  //       throw new NotFoundException('User with id not found');
+  //     }
+  //     // if ('enableFaceId' in payload) {
+  //     //   record.enableFaceId = payload.enableFaceId;
+  //     // }
+  //     if ('allowEmailNotifications' in payload) {
+  //       record.allowEmailNotifications = payload.allowEmailNotifications;
+  //     }
+  //     if ('allowSmsNotifications' in payload) {
+  //       record.allowSmsNotifications = payload.allowSmsNotifications;
+  //     }
+  //     if ('allowPushNotifications' in payload) {
+  //       record.allowPushNotifications = payload.allowPushNotifications;
+  //     }
+  //     // if (payload.dob && record.dob !== payload.dob) {
+  //     //   validatePastDate(payload.dob, 'dob');
+  //     //   record.dob = payload.dob;
+  //     // }
+  //     if (payload.phoneNumber && payload.phoneNumber !== record.phoneNumber) {
+  //       record.phoneNumber = payload.phoneNumber;
+  //     }
+  //     if (payload.email && payload.email !== record.email) {
+  //       validateEmailField(payload.email);
+  //       record.email = payload.email.toUpperCase();
+  //     }
+  //     if (payload.firstName && payload.firstName !== record.firstName) {
+  //       record.firstName = payload.firstName.toUpperCase();
+  //     }
+  //     if (payload.lastName && payload.lastName !== record.lastName) {
+  //       record.lastName = payload.lastName.toUpperCase();
+  //     }
+  //     // if (payload.gender && payload.gender !== record.gender) {
+  //     //   compareEnumValueFields(payload.gender, Object.values(Gender), 'gender');
+  //     //   record.gender = payload.gender;
+  //     // }
+  //     // if (payload.password) {
+  //     //   record.password = await hashPassword(payload.password);
+  //     // }
+  //     if (
+  //       payload.profileImageUrl &&
+  //       payload.profileImageUrl !== record.profileImageUrl
+  //     ) {
+  //       validateURLField(payload.profileImageUrl, 'profileImageUrl');
+  //       record.profileImageUrl = payload.profileImageUrl;
+  //     }
+
+  //     // Academic Background
+  //     if (
+  //       payload.highestLevelOfEducation &&
+  //       payload.highestLevelOfEducation !== record.highestLevelOfEducation
+  //     ) {
+  //       record.highestLevelOfEducation = payload.highestLevelOfEducation;
+  //     }
+  //     if (
+  //       payload.fieldOfStudy &&
+  //       JSON.stringify(payload.fieldOfStudy) !==
+  //         JSON.stringify(record.fieldOfStudy)
+  //     ) {
+  //       record.fieldOfStudy = payload.fieldOfStudy;
+  //     }
+  //     if (
+  //       payload.universityOrInstitution &&
+  //       payload.universityOrInstitution !== record.universityOrInstitution
+  //     ) {
+  //       record.universityOrInstitution = payload.universityOrInstitution;
+  //     }
+
+  //     // Career Interests
+  //     if (
+  //       payload.industriesOfInterest &&
+  //       JSON.stringify(payload.industriesOfInterest) !==
+  //         JSON.stringify(record.industriesOfInterest)
+  //     ) {
+  //       record.industriesOfInterest = payload.industriesOfInterest;
+  //     }
+  //     if (
+  //       payload.currentJobTitle &&
+  //       payload.currentJobTitle !== record.currentJobTitle
+  //     ) {
+  //       record.currentJobTitle = payload.currentJobTitle;
+  //     }
+  //     if (
+  //       payload.careerExperience &&
+  //       payload.careerExperience !== record.careerExperience
+  //     ) {
+  //       record.careerExperience = payload.careerExperience;
+  //     }
+
+  //     if (
+  //       payload.Carreer_Dream &&
+  //       payload.Carreer_Dream !== record.Carreer_Dream
+  //     ) {
+  //       record.Carreer_Dream = payload.Carreer_Dream;
+  //     }
+
+  //     if (
+  //       payload.Career_goals &&
+  //       payload.Career_goals !== record.Career_goals
+  //     ) {
+  //       record.Career_goals = payload.Career_goals;
+  //     }
+
+  //     if (
+  //       payload.Skill_developement_strategies &&
+  //       payload.Skill_developement_strategies !==
+  //         record.Skill_developement_strategies
+  //     ) {
+  //       record.Skill_developement_strategies =
+  //         payload.Skill_developement_strategies;
+  //     }
+
+  //     // Hobbies & Skills
+  //     if (
+  //       payload.hobbies &&
+  //       JSON.stringify(payload.hobbies) !== JSON.stringify(record.hobbies)
+  //     ) {
+  //       record.hobbies = payload.hobbies;
+  //     }
+  //     if (
+  //       payload.skills &&
+  //       JSON.stringify(payload.skills) !== JSON.stringify(record.skills)
+  //     ) {
+  //       record.skills = payload.skills;
+  //     }
+
+  //     // Future Aspirations
+  //     if (
+  //       payload.futureAspirations &&
+  //       payload.futureAspirations !== record.futureAspirations
+  //     ) {
+  //       record.futureAspirations = payload.futureAspirations;
+  //     }
+  //     // Academic Background
+  //     if (
+  //       payload.highestLevelOfEducation &&
+  //       payload.highestLevelOfEducation !== record.highestLevelOfEducation
+  //     ) {
+  //       record.highestLevelOfEducation = payload.highestLevelOfEducation;
+  //     }
+  //     if (
+  //       payload.fieldOfStudy &&
+  //       JSON.stringify(payload.fieldOfStudy) !==
+  //         JSON.stringify(record.fieldOfStudy)
+  //     ) {
+  //       record.fieldOfStudy = payload.fieldOfStudy;
+  //     }
+  //     if (
+  //       payload.universityOrInstitution &&
+  //       payload.universityOrInstitution !== record.universityOrInstitution
+  //     ) {
+  //       record.universityOrInstitution = payload.universityOrInstitution;
+  //     }
+
+  //     // Career Interests & Work Experience
+  //     if (
+  //       payload.currentStatus &&
+  //       payload.currentStatus !== record.currentStatus
+  //     ) {
+  //       record.currentStatus = payload.currentStatus;
+  //     }
+  //     if (
+  //       payload.industriesOfInterest &&
+  //       JSON.stringify(payload.industriesOfInterest) !==
+  //         JSON.stringify(record.industriesOfInterest)
+  //     ) {
+  //       record.industriesOfInterest = payload.industriesOfInterest;
+  //     }
+  //     if (
+  //       payload.currentJobTitle &&
+  //       payload.currentJobTitle !== record.currentJobTitle
+  //     ) {
+  //       record.currentJobTitle = payload.currentJobTitle;
+  //     }
+  //     if (
+  //       payload.careerExperience &&
+  //       payload.careerExperience !== record.careerExperience
+  //     ) {
+  //       record.careerExperience = payload.careerExperience;
+  //     }
+  //     if (
+  //       payload.workExperience &&
+  //       payload.workExperience !== record.workExperience
+  //     ) {
+  //       record.workExperience = payload.workExperience;
+  //     }
+  //     if (
+  //       payload.excitingWork &&
+  //       payload.excitingWork !== record.excitingWork
+  //     ) {
+  //       record.excitingWork = payload.excitingWork;
+  //     }
+
+  //     if (payload.ageRange && payload.ageRange !== record.ageRange) {
+  //       record.ageRange = payload.ageRange;
+  //     }
+
+  //     // Skills
+  //     if (
+  //       payload.technicalSkills &&
+  //       JSON.stringify(payload.technicalSkills) !==
+  //         JSON.stringify(record.technicalSkills)
+  //     ) {
+  //       record.technicalSkills = payload.technicalSkills;
+  //     }
+  //     if (
+  //       payload.softSkills &&
+  //       JSON.stringify(payload.softSkills) !== JSON.stringify(record.softSkills)
+  //     ) {
+  //       record.softSkills = payload.softSkills;
+  //     }
+
+  //     // Preferences
+  //     if (
+  //       payload.preferredWorkEnvironments &&
+  //       JSON.stringify(payload.preferredWorkEnvironments) !==
+  //         JSON.stringify(record.preferredWorkEnvironments)
+  //     ) {
+  //       record.preferredWorkEnvironments = payload.preferredWorkEnvironments;
+  //     }
+  //     if (
+  //       payload.learningPreferences &&
+  //       JSON.stringify(payload.learningPreferences) !==
+  //         JSON.stringify(record.learningPreferences)
+  //     ) {
+  //       record.learningPreferences = payload.learningPreferences;
+  //     }
+  //     if (
+  //       payload.careerChallenges &&
+  //       JSON.stringify(payload.careerChallenges) !==
+  //         JSON.stringify(record.careerChallenges)
+  //     ) {
+  //       record.careerChallenges = payload.careerChallenges;
+  //     }
+
+  //     // Future Aspirations & Additional Info
+  //     if (
+  //       payload.futureAspirations &&
+  //       payload.futureAspirations !== record.futureAspirations
+  //     ) {
+  //       record.futureAspirations = payload.futureAspirations;
+  //     }
+  //     if (
+  //       payload.additionalInfo &&
+  //       payload.additionalInfo !== record.additionalInfo
+  //     ) {
+  //       record.additionalInfo = payload.additionalInfo;
+  //     }
+
+  //     const updatedUser = await record.save();
+  //     return {
+  //       // data:updatedUser,
+  //       success: true,
+  //       code: HttpStatus.OK,
+  //       message: 'Updated',
+  //     };
+  //   } catch (ex) {
+  //     this.logger.error(ex);
+  //     throw ex;
+  //   }
+  // }
 
   async updateMentorshipAndProfessionalInfo(
     userId: string,
@@ -944,7 +987,7 @@ export class UsersService {
     };
   }
 
-   async toggleMentorVerificationStatus(
+  async toggleMentorVerificationStatus(
     userId: string,
     status: boolean,
   ): Promise<any> {
@@ -966,17 +1009,17 @@ export class UsersService {
   }
 
   async deactivateAllMentors(): Promise<any> {
-  const result = await this.UsersModel.updateMany(
-    { role: 'Mentor', mentorVerificationStatus: false },
-    { $set: { mentorVerificationStatus: false } }
-  );
+    const result = await this.UsersModel.updateMany(
+      { role: 'Mentor', mentorVerificationStatus: false },
+      { $set: { mentorVerificationStatus: false } }
+    );
 
-  return {
-    success: true,
-    updatedCount: result.modifiedCount,
-    message: 'All mentors have been deactivated (mentorVerificationStatus set to false)',
-  };
-}
+    return {
+      success: true,
+      updatedCount: result.modifiedCount,
+      message: 'All mentors have been deactivated (mentorVerificationStatus set to false)',
+    };
+  }
 
   async updateUserPlanPrices(userId: string, dto: UpdatePlanPricesDto) {
     const user = await this.UsersModel.findById(userId);
@@ -1187,32 +1230,32 @@ export class UsersService {
     };
   }
 
-async getMentorsByVerificationStatus(
-  status: boolean,
-  page: number,
-  limit: number,
-): Promise<any> {
-  const skip = (page - 1) * limit;
+  async getMentorsByVerificationStatus(
+    status: boolean,
+    page: number,
+    limit: number,
+  ): Promise<any> {
+    const skip = (page - 1) * limit;
 
-  const [mentors, total] = await Promise.all([
-    this.UsersModel
-      .find({ role: 'Mentor', mentorVerificationStatus: status })
-      .select('firstName lastName email mentorVerificationStatus')
-      .skip(skip)
-      .limit(limit)
-      .exec(),
-    this.UsersModel.countDocuments({ role: 'Mentor', mentorVerificationStatus: status }),
-  ]);
+    const [mentors, total] = await Promise.all([
+      this.UsersModel
+        .find({ role: 'Mentor', mentorVerificationStatus: status })
+        .select('firstName lastName email mentorVerificationStatus')
+        .skip(skip)
+        .limit(limit)
+        .exec(),
+      this.UsersModel.countDocuments({ role: 'Mentor', mentorVerificationStatus: status }),
+    ]);
 
-  return {
-    success: true,
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit),
-    data: mentors,
-  };
-}
+    return {
+      success: true,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      data: mentors,
+    };
+  }
 
 
   async getAllUsersSearch(
